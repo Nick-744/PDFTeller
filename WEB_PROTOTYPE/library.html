@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>My Library - PDF Teller</title>
+    <link rel="stylesheet" href="css/index_style.css">
+    <link rel="stylesheet" href="css/library_style.css">
+    <style>
+        .library-container { max-width:900px; margin: 40px auto; }
+        .book { background: white; padding: 18px; border-radius: 12px; margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center; }
+        .book-info { display:flex; gap:12px; align-items:center; }
+        .book-title { font-weight:700; }
+        .book-meta { color:#6c757d; font-size:0.9rem }
+        .book-actions button { margin-left:8px }
+        .bookmark-list { margin-top:8px }
+        .bookmark { display:inline-block; background:#f8f9fa; padding:6px 10px; border-radius:8px; margin-right:8px; margin-bottom:6px; }
+    </style>
+</head>
+<body>
+    <div class="library-container">
+        <h1>My Library</h1>
+        <p>Saved books and bookmarks you have created.</p>
+
+        <div id="books"></div>
+
+        <hr>
+        <h3>Add current processed PDF to library</h3>
+        <p>When you process a PDF, a snapshot of the processed data can be saved to your library for later reading.</p>
+        <button id="saveCurrentBtn">Save Current PDF to Library</button>
+    </div>
+
+    <script src="javascript/library.js"></script>
+</body>
+</html>

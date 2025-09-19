@@ -148,10 +148,6 @@ body.dyslexic-mode {
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-.dyslexic-mode .pdf-icon {
-    animation: none;
-}
-
 .dyslexic-mode .pdf-name {
     color: #f5e6d3;
 }

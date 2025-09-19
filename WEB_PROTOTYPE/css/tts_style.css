@@ -218,8 +218,8 @@ body {
 .control-btn.primary {
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
-    width: 80px;
-    height: 80px;
+    width: 65px;
+    height: 65px;
     font-size: 2rem;
     box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
 }
@@ -345,7 +345,6 @@ body {
 
 .pdf-icon {
     font-size: 2.5rem;
-    animation: float 3s ease-in-out infinite;
 }
 
 @keyframes float {
@@ -431,6 +430,14 @@ body {
     display: none !important;
 }
 
+/* Utility to disable animations/transitions when switching themes */
+.no-animations *,
+.no-animations *::before,
+.no-animations *::after {
+    animation: none !important;
+    transition: none !important;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     body {
@@ -455,8 +462,8 @@ body {
     }
     
     .control-btn.primary {
-        width: 70px;
-        height: 70px;
+        width: 55px;
+        height: 55px;
         font-size: 1.5rem;
     }
     

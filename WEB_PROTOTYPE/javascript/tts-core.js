@@ -1,49 +1,40 @@
-// TTS Controller - Text-to-Speech functionality
+// TTS core - contains TTSController class only (no DOM instantiation)
 class TTSController {
     constructor() {
-        this.textBlocks = []
-        this.currentIndex = 0
-        this.utterance = null
-        this.isPlaying = false
+        this.textBlocks     = []
+        this.currentIndex   = 0
+        this.utterance      = null
+        this.isPlaying      = false
         this.isDyslexicMode = false
-        
-        this.initElements()
-        this.loadPDFData()
+
+        // Elements will be injected by page-specific initializer
+        this.elements = {}
+    }
+
+    // Page should call this to connect DOM elements
+    attachElements(el) {
+        this.elements       = el
+        this.textDisplay    = el.textDisplay
+        this.currentBlockEl = el.currentBlockEl
+        this.totalBlocksEl  = el.totalBlocksEl
+        this.playBtn        = el.playBtn
+        this.stopBtn        = el.stopBtn
+        this.prevBtn        = el.prevBtn
+        this.nextBtn        = el.nextBtn
+        this.speedRange     = el.speedRange
+        this.volumeRange    = el.volumeRange
+        this.voiceSelect    = el.voiceSelect
+        this.progressFill   = el.progressFill
+        this.pdfName        = el.pdfName
+        this.pdfStats       = el.pdfStats
+        this.loadingOverlay = el.loadingOverlay
+        this.errorOverlay   = el.errorOverlay
+        this.dyslexiaToggle = el.dyslexiaToggle
+
+        // Setup handlers that depend on elements
         this.setupEventListeners()
         this.loadVoices()
         this.setupDyslexiaToggle()
-    }
-
-    initElements() {
-        // Text display
-        this.textDisplay = document.getElementById('textDisplay')
-        this.currentBlockEl = document.getElementById('currentBlock')
-        this.totalBlocksEl = document.getElementById('totalBlocks')
-        
-        // Controls
-        this.playBtn = document.getElementById('playBtn')
-        this.stopBtn = document.getElementById('stopBtn')
-        this.prevBtn = document.getElementById('prevBtn')
-        this.nextBtn = document.getElementById('nextBtn')
-        
-        // Settings
-        this.speedRange = document.getElementById('speedRange')
-        this.volumeRange = document.getElementById('volumeRange')
-        this.voiceSelect = document.getElementById('voiceSelect')
-        
-        // Progress
-        this.progressFill = document.getElementById('progressFill')
-        
-        // PDF info
-        this.pdfName = document.getElementById('pdfName')
-        this.pdfStats = document.getElementById('pdfStats')
-        
-        // Overlays
-        this.loadingOverlay = document.getElementById('loadingOverlay')
-        this.errorOverlay = document.getElementById('errorOverlay')
-        
-        // Dyslexia toggle
-        this.dyslexiaToggle = document.getElementById('dyslexiaToggle')
     }
 
     setupDyslexiaToggle() {
@@ -52,30 +43,37 @@ class TTSController {
         if (savedMode === 'true') {
             this.enableDyslexicMode()
         }
-        
+
         // Toggle button event
-        this.dyslexiaToggle.onclick = () => {
-            this.isDyslexicMode = !this.isDyslexicMode
-            if (this.isDyslexicMode) {
-                this.enableDyslexicMode()
-            } else {
-                this.disableDyslexicMode()
+        if (this.dyslexiaToggle) {
+            this.dyslexiaToggle.onclick = () => {
+                this.isDyslexicMode = !this.isDyslexicMode
+                if (this.isDyslexicMode) {
+                    this.enableDyslexicMode()
+                }
+                else {
+                    this.disableDyslexicMode()
+                }
+                // Save preference
+                localStorage.setItem('dyslexicMode', this.isDyslexicMode.toString())
             }
-            // Save preference
-            localStorage.setItem('dyslexicMode', this.isDyslexicMode.toString())
         }
     }
 
     enableDyslexicMode() {
         document.body.classList.add('dyslexic-mode')
-        this.dyslexiaToggle.innerHTML = 'Standard Theme'
+        if (this.dyslexiaToggle) this.dyslexiaToggle.innerHTML = 'Standard Theme'
         this.isDyslexicMode = true
+        // Ensure animations are enabled in dyslexic mode
+        document.documentElement.classList.remove('no-animations')
     }
 
     disableDyslexicMode() {
         document.body.classList.remove('dyslexic-mode')
-        this.dyslexiaToggle.innerHTML = 'Dyslexic Friendly Theme'
+        if (this.dyslexiaToggle) this.dyslexiaToggle.innerHTML = 'Dyslexic Friendly Theme'
         this.isDyslexicMode = false
+        // When switching to standard theme, remove animations for a calmer experience
+        document.documentElement.classList.add('no-animations')
     }
 
     loadPDFData() {
@@ -83,25 +81,30 @@ class TTSController {
             const data = sessionStorage.getItem('pdfProcessedData')
             if (!data) {
                 this.showError()
-                return
+
+                return;
             }
-            
-            const pdfData = JSON.parse(data)
+
+            const pdfData   = JSON.parse(data)
             this.textBlocks = pdfData.textBlocks || []
-            
+
             if (this.textBlocks.length === 0) {
                 this.showError()
-                return
+
+                return;
             }
-            
+
             // Update UI
-            this.pdfName.textContent = pdfData.filename || 'PDF Document'
-            this.pdfStats.textContent = `${this.textBlocks.length} text blocks`
-            this.totalBlocksEl.textContent = this.textBlocks.length
-            
+            if (this.pdfName)
+                this.pdfName.textContent       = pdfData.filename || 'PDF Document'
+            if (this.pdfStats)
+                this.pdfStats.textContent      = `${this.textBlocks.length} text blocks`
+            if (this.totalBlocksEl)
+                this.totalBlocksEl.textContent = this.textBlocks.length
+
             this.updateDisplay()
             this.hideLoading()
-            
+
         } catch (error) {
             console.error('Error loading PDF:', error)
             this.showError()
@@ -109,43 +112,46 @@ class TTSController {
     }
 
     setupEventListeners() {
+        if (!this.playBtn) return
         // Playback controls
         this.playBtn.onclick = () => this.play()
         this.stopBtn.onclick = () => this.stop()
         this.prevBtn.onclick = () => this.previous()
         this.nextBtn.onclick = () => this.next()
-        
+
         // Settings with smooth value updates
         this.speedRange.oninput = (e) => {
             const value = parseFloat(e.target.value).toFixed(1)
-            document.getElementById('speedValue').textContent = `${value}x`
+            const el    = document.getElementById('speedValue')
+            if (el) el.textContent = `${value}x`
         }
-        
+
         this.volumeRange.oninput = (e) => {
             const value = Math.round(e.target.value * 100)
-            document.getElementById('volumeValue').textContent = `${value}%`
+            const el    = document.getElementById('volumeValue')
+            if (el) el.textContent = `${value}%`
         }
-        
+
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'SELECT') return
-            
+            if (e.target.tagName === 'SELECT') return;
+
             switch(e.code) {
                 case 'Space':
                     e.preventDefault()
                     this.isPlaying ? this.stop() : this.play()
-                    break
+                    break;
                 case 'ArrowLeft':
                     e.preventDefault()
                     this.previous()
-                    break
+                    break;
                 case 'ArrowRight':
                     e.preventDefault()
                     this.next()
-                    break
+                    break;
                 case 'Escape':
                     this.stop()
-                    break
+                    break;
             }
         })
     }
@@ -153,28 +159,30 @@ class TTSController {
     loadVoices() {
         const loadVoiceOptions = () => {
             const voices = speechSynthesis.getVoices()
+            if (!this.voiceSelect) return;
             this.voiceSelect.innerHTML = ''
-            
+
             if (voices.length === 0) {
                 this.voiceSelect.innerHTML = '<option>No voices available</option>'
-                return
+                
+                return;
             }
-            
+
             // Group voices by language
             const grouped = {}
             voices.forEach((voice, i) => {
-                const lang = voice.lang.split('-')[0].toUpperCase()
+                const lang = (voice.lang || '').split('-')[0].toUpperCase()
                 if (!grouped[lang]) grouped[lang] = []
                 grouped[lang].push({ voice, index: i })
             })
-            
+
             // Add English voices first if available
             if (grouped['EN']) {
                 const optgroup = document.createElement('optgroup')
                 optgroup.label = 'English'
                 grouped['EN'].forEach(({ voice, index }) => {
-                    const option = document.createElement('option')
-                    option.value = index
+                    const option       = document.createElement('option')
+                    option.value       = index
                     option.textContent = voice.name
                     if (voice.default) option.selected = true
                     optgroup.appendChild(option)
@@ -182,31 +190,31 @@ class TTSController {
                 this.voiceSelect.appendChild(optgroup)
                 delete grouped['EN']
             }
-            
+
             // Add other languages
             Object.keys(grouped).sort().forEach(lang => {
                 const optgroup = document.createElement('optgroup')
                 optgroup.label = lang
                 grouped[lang].forEach(({ voice, index }) => {
-                    const option = document.createElement('option')
-                    option.value = index
+                    const option       = document.createElement('option')
+                    option.value       = index
                     option.textContent = voice.name
                     optgroup.appendChild(option)
                 })
                 this.voiceSelect.appendChild(optgroup)
             })
         }
-        
+
         loadVoiceOptions()
         speechSynthesis.onvoiceschanged = loadVoiceOptions
     }
 
     play() {
-        if (this.textBlocks.length === 0) return
-        
+        if (this.textBlocks.length === 0) return;
+
         // If already playing, do nothing
-        if (this.isPlaying) return
-        
+        if (this.isPlaying) return;
+
         this.speak()
     }
 
@@ -215,7 +223,7 @@ class TTSController {
         speechSynthesis.cancel()
         this.isPlaying = false
         this.updateButtons()
-        this.textDisplay.classList.remove('speaking')
+        if (this.textDisplay) this.textDisplay.classList.remove('speaking')
     }
 
     previous() {
@@ -224,10 +232,10 @@ class TTSController {
             if (this.isPlaying) {
                 speechSynthesis.cancel()
             }
-            
+
             this.currentIndex--
             this.updateDisplay()
-            
+
             // Resume playing if it was playing
             if (this.isPlaying) {
                 this.speak()
@@ -241,10 +249,10 @@ class TTSController {
             if (this.isPlaying) {
                 speechSynthesis.cancel()
             }
-            
+
             this.currentIndex++
             this.updateDisplay()
-            
+
             // Resume playing if it was playing
             if (this.isPlaying) {
                 this.speak()
@@ -256,77 +264,81 @@ class TTSController {
         const text = this.textBlocks[this.currentIndex]
         if (!text || text.trim() === '') {
             this.next()
-            return
+
+            return;
         }
-        
-        const utterance = new SpeechSynthesisUtterance(text)
-        utterance.rate = parseFloat(this.speedRange.value)
-        utterance.pitch = 1.0  // Fixed pitch
+
+        const utterance  = new SpeechSynthesisUtterance(text)
+        utterance.rate   = parseFloat(this.speedRange.value)
+        utterance.pitch  = 1.0 // Fixed pitch
         utterance.volume = parseFloat(this.volumeRange.value)
-        
+
         const voices = speechSynthesis.getVoices()
         if (voices[this.voiceSelect.value]) {
             utterance.voice = voices[this.voiceSelect.value]
         }
-        
+
         utterance.onstart = () => {
             this.isPlaying = true
             this.updateButtons()
-            this.textDisplay.classList.add('speaking')
+            if (this.textDisplay) this.textDisplay.classList.add('speaking')
         }
-        
+
         utterance.onend = () => {
-            this.textDisplay.classList.remove('speaking')
+            if (this.textDisplay) this.textDisplay.classList.remove('speaking')
             if (this.currentIndex < this.textBlocks.length - 1) {
                 this.currentIndex++
                 this.updateDisplay()
-                setTimeout(() => this.speak(), 300) // Small pause between blocks
-            } else {
+                setTimeout(() => this.speak(), 200) // Small pause between blocks
+            }
+            else {
                 this.stop()
                 this.showCompletionMessage()
             }
         }
-        
+
         utterance.onerror = (event) => {
             console.error('Speech error:', event)
             this.stop()
         }
-        
+
         speechSynthesis.speak(utterance)
     }
 
     updateDisplay() {
-        this.textDisplay.textContent = this.textBlocks[this.currentIndex] || 
-            'No text available'
-        this.currentBlockEl.textContent = this.currentIndex + 1
+        if (this.textDisplay)
+            this.textDisplay.textContent    = this.textBlocks[this.currentIndex] || 'No text available'
+        if (this.currentBlockEl)
+            this.currentBlockEl.textContent = this.currentIndex + 1
         this.updateProgress()
         this.updateButtons()
     }
 
     updateProgress() {
         const progress = ((this.currentIndex + 1) / this.textBlocks.length) * 100
-        this.progressFill.style.width = `${progress}%`
+        if (this.progressFill) this.progressFill.style.width = `${progress}%`
     }
 
     updateButtons() {
         // Play button is disabled when playing
-        this.playBtn.disabled = this.isPlaying
-        
+        if (this.playBtn) this.playBtn.disabled = this.isPlaying
+
         // Stop button is enabled when playing
-        this.stopBtn.disabled = !this.isPlaying
-        
+        if (this.stopBtn) this.stopBtn.disabled = !this.isPlaying
+
         // Navigation buttons
-        this.prevBtn.disabled = this.currentIndex === 0
-        this.nextBtn.disabled = this.currentIndex === this.textBlocks.length - 1
+        if (this.prevBtn) this.prevBtn.disabled = this.currentIndex === 0
+        if (this.nextBtn) this.nextBtn.disabled = this.currentIndex === this.textBlocks.length - 1
     }
 
     showCompletionMessage() {
+        if (!this.textDisplay) return
         const originalText = this.textDisplay.textContent
         this.textDisplay.innerHTML = `
             <div style="text-align: center; animation: fadeIn 0.5s ease;">
-                <h3 style="color: #28a745; margin-bottom: 10px;">🎉 Reading Complete!</h3>
+                <h3 style="color: #28a745; margin-bottom: 10px;">Reading Complete!</h3>
                 <p style="color: #6c757d;">Finished all ${this.textBlocks.length} text blocks</p>
-                <button onclick="tts.currentIndex=0; tts.updateDisplay(); tts.play()" 
+                <button id="readAgainBtn" 
                         style="margin-top: 15px; padding: 10px 20px; 
                                background: linear-gradient(135deg, #28a745, #20c997);
                                color: white; border: none; border-radius: 8px;
@@ -335,28 +347,31 @@ class TTSController {
                 </button>
             </div>
         `
-        
+
+        // Attach event to the read again button
+        const readAgainBtn = document.getElementById('readAgainBtn')
+        if (readAgainBtn) {
+            readAgainBtn.addEventListener('click', () => {
+                this.currentIndex = 0
+                this.updateDisplay()
+                this.play()
+            })
+        }
+
         setTimeout(() => {
-            this.textDisplay.textContent = originalText
+            if (this.textDisplay) this.textDisplay.textContent = originalText
         }, 5000)
     }
 
     showError() {
-        this.loadingOverlay.classList.add('hidden')
-        this.errorOverlay.classList.remove('hidden')
+        if (this.loadingOverlay) this.loadingOverlay.classList.add('hidden')
+        if (this.errorOverlay) this.errorOverlay.classList.remove('hidden')
     }
 
     hideLoading() {
-        this.loadingOverlay.classList.add('hidden')
+        if (this.loadingOverlay) this.loadingOverlay.classList.add('hidden')
     }
 }
 
-// Initialize TTS Controller when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    window.tts = new TTSController()
-})
-
-// Cleanup on page unload
-window.addEventListener('beforeunload', () => {
-    speechSynthesis.cancel()
-})
+// Export the class to window so page code can use it
+if (typeof window !== 'undefined') window.TTSController = TTSController
