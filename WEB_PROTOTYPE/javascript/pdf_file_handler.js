@@ -9,6 +9,8 @@ const fileSize      = document.getElementById('fileSize')
 const removeBtn     = document.getElementById('removeBtn')
 const statusMessage = document.getElementById('statusMessage')
 
+// No close button: notifications will appear without a manual dismiss control
+
 // Global variable to store the selected file
 let selectedFile = null
 
@@ -148,7 +150,7 @@ function processSelectedFile(file) {
         // Small delay to let UI update first
         setTimeout(() => {
             window.processUploadedPDF()
-        }, 500)
+        }, 1000)
     }
 
     return;
@@ -260,9 +262,21 @@ function showStatusMessage(message, type) {
         statusTimeout = null
     }
 
-    statusMessage.textContent   = message
-    statusMessage.className     = `status-message ${type}`
-    statusMessage.style.display = 'block'
+    // Set accessible attributes
+    statusMessage.setAttribute('role', 'status')
+    statusMessage.setAttribute(
+        'aria-live', type === 'error' ? 'assertive' : 'polite'
+    )
+
+    // Populate content
+    statusMessage.textContent = ''
+    const msgNode             = document.createElement('div')
+    msgNode.className         = 'status-text'
+    msgNode.textContent       = message
+    statusMessage.appendChild(msgNode)
+
+    // Set classes and make visible
+    statusMessage.className = `status-message ${type} show`
     
     // Auto-hide success messages after [x] seconds
     if (type === 'success') {
@@ -270,7 +284,7 @@ function showStatusMessage(message, type) {
         statusTimeout = setTimeout(() => {
             hideStatusMessage()
             statusTimeout = null
-        }, 3000)
+        }, 4000)
     }
     else if (type === 'error') {
         // Keep error messages visible until user action
@@ -288,8 +302,17 @@ function hideStatusMessage() {
         statusTimeout = null
     }
 
-    statusMessage.style.display = 'none'
-    statusMessage.className     = 'status-message'
+    // Remove visible class for animation
+    statusMessage.className = 'status-message'
+
+    // clear content but keep close button reference (so it can be re-used)
+    // remove child nodes except the close button
+    // Remove all children to ensure a fresh state next time
+    Array.from(statusMessage.childNodes).forEach(node => node.remove())
+
+    // remove ARIA attrs
+    statusMessage.removeAttribute('role')
+    statusMessage.removeAttribute('aria-live')
 
     return;
 }

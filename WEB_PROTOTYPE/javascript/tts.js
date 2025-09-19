@@ -68,18 +68,14 @@ class TTSController {
 
     enableDyslexicMode() {
         document.body.classList.add('dyslexic-mode')
-        this.dyslexiaToggle.innerHTML = '👁️ Standard Mode'
+        this.dyslexiaToggle.innerHTML = 'Standard Theme'
         this.isDyslexicMode = true
     }
 
     disableDyslexicMode() {
         document.body.classList.remove('dyslexic-mode')
-        this.dyslexiaToggle.innerHTML = '👁️ Dyslexic Friendly'
+        this.dyslexiaToggle.innerHTML = 'Dyslexic Friendly Theme'
         this.isDyslexicMode = false
-        
-        // Reset to default speed
-        this.speedRange.value = '1.2'
-        document.getElementById('speedValue').textContent = '1.2x'
     }
 
     loadPDFData() {
@@ -335,7 +331,7 @@ class TTSController {
                                background: linear-gradient(135deg, #28a745, #20c997);
                                color: white; border: none; border-radius: 8px;
                                cursor: pointer; font-weight: 600;">
-                    🔄 Read Again
+                    Read Again
                 </button>
             </div>
         `

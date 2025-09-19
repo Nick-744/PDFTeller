@@ -108,11 +108,11 @@ function showTTSNavigationButton() {
         navContainer.innerHTML = `
             <div class="nav-content">
                 <div class="nav-text">
-                    <h3>✅ PDF Processing Complete!</h3>
+                    <h3>PDF Processing Complete!</h3>
                     <p>Your PDF has been successfully processed and is ready for text-to-speech playback.</p>
                 </div>
                 <button id="goToTTSBtn" class="nav-button">
-                    🎧 Open Text-to-Speech Reader
+                    Open Text-to-Speech Reader
                 </button>
             </div>
         `
@@ -140,7 +140,7 @@ function navigateToTTS() {
     }
     
     // Navigate to TTS page
-    window.location.href = 'tts.html'
+    window.location.href = 'text2speech-main.html'
 
     return;
 }

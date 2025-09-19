@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF Teller</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="css/tts_style.css">
     <link rel="stylesheet" href="css/tts_dyslexic.css">
 </head>
@@ -11,14 +12,14 @@
 <body>
     <!-- Dyslexia Toggle Button -->
     <button id="dyslexiaToggle" class="dyslexia-toggle">
-        👁️ Dyslexic Friendly
+        Dyslexic Friendly Theme
     </button>
 
     <div class="container">
         <!-- Text Display Section (Top) -->
         <div class="text-section glass">
             <div class="text-header">
-                <h2><span class="emoji">📖</span>Currently Reading</h2>
+                <h2>Currently Reading</h2>
                 <span class="block-counter">
                     Block <span id="currentBlock">1</span> of <span id="totalBlocks">0</span>
                 </span>
@@ -39,26 +40,34 @@
 
             <!-- Playback Controls -->
             <div class="playback-controls">
-                <button id="prevBtn" class="control-btn" title="Previous">⏮</button>
-                <button id="playBtn" class="control-btn primary" title="Play">▶</button>
-                <button id="stopBtn" class="control-btn" disabled title="Stop">⏹</button>
-                <button id="nextBtn" class="control-btn" title="Next">⏭</button>
+                <button id="prevBtn" class="control-btn" title="Previous">
+                    <i class="material-icons">skip_previous</i>
+                </button>
+                <button id="playBtn" class="control-btn primary" title="Play">
+                    <i class="material-icons">play_arrow</i>
+                </button>
+                <button id="stopBtn" class="control-btn" disabled title="Stop">
+                    <i class="material-icons">stop</i>
+                </button>
+                <button id="nextBtn" class="control-btn" title="Next">
+                    <i class="material-icons">skip_next</i>
+                </button>
             </div>
 
             <!-- Voice Settings -->
             <div class="voice-settings">
                 <div class="setting-control">
-                    <label><span class="emoji">⚡</span>Speed</label>
+                    <label>Speed</label>
                     <input type="range" id="speedRange" min="0.5" max="2" step="0.1" value="1.2">
                     <span class="setting-value" id="speedValue">1.2x</span>
                 </div>
                 <div class="setting-control">
-                    <label><span class="emoji">🔊</span>Volume</label>
+                    <label>Volume</label>
                     <input type="range" id="volumeRange" min="0" max="1" step="0.1" value="1">
                     <span class="setting-value" id="volumeValue">100%</span>
                 </div>
                 <div class="setting-control">
-                    <label><span class="emoji">🎤</span>Voice</label>
+                    <label>Voice</label>
                     <select id="voiceSelect">
                         <option>Loading voices...</option>
                     </select>
@@ -76,8 +85,8 @@
                         <div class="pdf-stats" id="pdfStats">0 text blocks</div>
                     </div>
                 </div>
-                <button class="upload-btn" onclick="window.location.href='index.html'">
-                    📤 Upload New PDF
+                <button class="upload-btn" onclick="window.location.href='your_pdf-index.html'">
+                    Upload New PDF
                 </button>
             </div>
         </div>
@@ -94,9 +103,9 @@
     <!-- Error Overlay -->
     <div class="overlay hidden" id="errorOverlay">
         <div class="overlay-content">
-            <h3 style="color: #dc3545; margin-bottom: 15px; font-size: 1.5rem;">❌ No PDF Data Found</h3>
+            <h3 style="color: #dc3545; margin-bottom: 15px; font-size: 1.5rem;">No PDF Data Found!</h3>
             <p style="color: #6c757d; margin-bottom: 20px;">Please upload a PDF file first.</p>
-            <button class="upload-btn" onclick="window.location.href='index.html'">
+            <button class="upload-btn" onclick="window.location.href='your_pdf-index.html'">
                 Go to Upload
             </button>
         </div>
