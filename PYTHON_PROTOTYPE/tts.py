@@ -1,4 +1,5 @@
 from process_pdf import process_pdf_text_with_structure
+from pathlib import Path
 from time import sleep
 import pyttsx3
 
@@ -12,7 +13,10 @@ def speak_text(text: str) -> None:
     return;
 
 def main():
-    text = process_pdf_text_with_structure('Understanding_Climate_Change.pdf')
+    base_path = Path(__file__).parent.parent # Go up 1 directory!
+    text      = process_pdf_text_with_structure(
+        base_path / 'Understanding_Climate_Change.pdf'
+    )
     print(f'Number of sentences: {len(text)}\n')
 
     for sentence in text:
