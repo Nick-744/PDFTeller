@@ -245,21 +245,36 @@ function clearFileInput() {
     return;
 }
 
+// Global variable to track the timeout
+let statusTimeout = null
+
 /**
  * Show status message with specified type
  * @param {string} message - Message to display
  * @param {string} type    - Message type ('success' or 'error')
  */
 function showStatusMessage(message, type) {
+    // Clear any existing timeout first!
+    if (statusTimeout) {
+        clearTimeout(statusTimeout)
+        statusTimeout = null
+    }
+
     statusMessage.textContent   = message
     statusMessage.className     = `status-message ${type}`
     statusMessage.style.display = 'block'
     
-    // Auto-hide success messages after 4 seconds
+    // Auto-hide success messages after [x] seconds
     if (type === 'success') {
-        setTimeout(() => {
-            hideStatusMessage();
-        }, 4000);
+        // Store the timeout id so it can be cleared if an error appears!
+        statusTimeout = setTimeout(() => {
+            hideStatusMessage()
+            statusTimeout = null
+        }, 5000)
+    }
+    else if (type === 'error') {
+        // Keep error messages visible until user action
+        // statusTimeout remains null for errors
     }
 
     return;
@@ -267,6 +282,12 @@ function showStatusMessage(message, type) {
 
 // Hide the status message
 function hideStatusMessage() {
+    // Also clear timeout when manually hiding
+    if (statusTimeout) {
+        clearTimeout(statusTimeout)
+        statusTimeout = null
+    }
+
     statusMessage.style.display = 'none'
     statusMessage.className     = 'status-message'
 
