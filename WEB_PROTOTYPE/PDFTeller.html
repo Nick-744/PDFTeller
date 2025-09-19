@@ -458,11 +458,6 @@
             updateButtons();
         });
 
-        // Double-click pause button to stop
-        pauseBtn.addEventListener('dblclick', () => {
-            stop();
-        });
-
         rateSlider.addEventListener('input', (e) => {
             rateValue.textContent = `${e.target.value}x`;
         });
