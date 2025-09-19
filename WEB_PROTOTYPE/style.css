@@ -1,0 +1,224 @@
+/* Reset and base styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Main container styling */
+.container {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 100%;
+}
+
+/* Header section styles */
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    color: #333;
+    font-size: 28px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.header p {
+    color: #666;
+    font-size: 16px;
+}
+
+/* Upload section container */
+.upload-section {
+    margin-bottom: 20px;
+}
+
+/* Custom upload button styling */
+.upload-button {
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 16px;
+    transition: background 0.3s ease;
+    border: none;
+    margin-bottom: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+.upload-button:hover {
+    background: #5a6fd8;
+}
+
+/* Drop zone styling */
+.drop-zone {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #fafafa;
+}
+
+/* Drop zone hover and active states */
+.drop-zone:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.drop-zone.drag-over {
+    border-color: #667eea;
+    background: #e8f2ff;
+    transform: scale(1.02);
+}
+
+/* Drop zone content */
+.drop-zone-content {
+    color: #666;
+}
+
+/* Upload icon styling */
+.upload-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    color: #999;
+}
+
+.drop-zone-content p {
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.or-text {
+    color: #999;
+    font-size: 14px;
+    margin: 12px 0;
+}
+
+.browse-text {
+    color: #667eea;
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+/* File information display */
+.file-info {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+    border-left: 4px solid #28a745;
+}
+
+/* File details container */
+.file-details {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* File icon */
+.file-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+/* File text information */
+.file-text {
+    flex-grow: 1;
+}
+
+.file-name {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.file-size {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Remove file button */
+.remove-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+}
+
+.remove-btn:hover {
+    background: #c82333;
+}
+
+/* Status message styling */
+.status-message {
+    text-align: center;
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 16px;
+    font-size: 14px;
+    display: none;
+}
+
+/* Success message */
+.status-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    display: block;
+}
+
+/* Error message */
+.status-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    display: block;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 600px) {
+    .container {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+    
+    .header h1 {
+        font-size: 24px;
+    }
+    
+    .drop-zone {
+        padding: 30px 15px;
+    }
+}

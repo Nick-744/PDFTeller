@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF File Input</title>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Main container for the PDF input interface -->
+    <div class="container">
+        <!-- Header section with title -->
+        <div class="header">
+            <h1>PDF File Upload</h1>
+            <p>Select a PDF file to upload</p>
+        </div>
+
+        <!-- File input section -->
+        <div class="upload-section">
+            <!-- Hidden file input (styled through label) -->
+            <input type="file" id="pdfInput" accept=".pdf" hidden>
+            
+            <!-- Custom styled label that acts as the file picker button -->
+            <label for="pdfInput" class="upload-button">
+                Choose PDF File
+            </label>
+            
+            <!-- Drop zone for drag and drop functionality -->
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-content">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7,10 12,15 17,10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <p>Drag and drop your PDF here</p>
+                    <p class="or-text">or</p>
+                    <span class="browse-text">click to browse</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- File information display section (initially hidden) -->
+        <div class="file-info" id="fileInfo" style="display: none;">
+            <div class="file-details">
+                <div class="file-icon">📄</div>
+                <div class="file-text">
+                    <div class="file-name" id="fileName"></div>
+                    <div class="file-size" id="fileSize"></div>
+                </div>
+                <!-- Remove file button -->
+                <button class="remove-btn" id="removeBtn" title="Remove file">✕</button>
+            </div>
+        </div>
+
+        <!-- Status message area -->
+        <div class="status-message" id="statusMessage"></div>
+    </div>
+
+    <!-- External libraries for PDF processing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sbd/1.0.19/sbd.min.js"></script>
+    
+    <!-- Link to external JavaScript files -->
+    <script src="pdf_file_handler.js"></script>
+    <script src="process_pdf.js"></script>
+</body>
+</html>
