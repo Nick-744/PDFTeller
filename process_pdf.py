@@ -1,0 +1,50 @@
+from nltk.tokenize import sent_tokenize
+import pymupdf
+
+def process_pdf_text_with_structure(filename: str) -> list[str]:
+    doc            = pymupdf.open(filename)
+    processed_text = []
+    
+    for page in doc:
+        # Get lines from the page
+        page_text = page.get_text()
+        lines     = page_text.split('\n')
+
+        current_block = [] # To accumulate lines of regular text!
+        for line in lines:
+            line = line.strip()
+
+            # STUPID PDFs sometimes have empty lines...
+            if not line:
+                continue;
+            
+            # Check if this might be a chapter/section header!
+            if (len(line) < 50) and not line.endswith('.'):
+                # --- <> Process accumulated text <> --- #
+                if current_block:
+                    block_text    = ' '.join(current_block)
+                    sentences     = sent_tokenize(block_text)
+                    processed_text.extend(sentences)
+                    current_block = []
+                
+                # Add the header as its own element...
+                processed_text.append(line)
+            else:
+                current_block.append(line) # Will be processed later
+        
+        # Process any remaining text
+        if current_block:
+            block_text = ' '.join(current_block)
+            sentences  = sent_tokenize(block_text)
+            processed_text.extend(sentences)
+    
+    doc.close()
+
+    return processed_text;
+
+if __name__ == '__main__':
+    processed_text = process_pdf_text_with_structure('Understanding_Climate_Change.pdf')
+    for (i, sentence) in enumerate(processed_text):
+        print(f"{i+1}: {sentence}")
+        if i >= 20:
+            break;
