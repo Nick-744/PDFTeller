@@ -3,130 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Teller - Text-to-Speech</title>
+    <title>PDF Teller</title>
     <link rel="stylesheet" href="css/tts_style.css">
+    <link rel="stylesheet" href="css/tts_dyslexic.css">
 </head>
 
 <body>
-    <!-- Main container for the TTS interface -->
+    <!-- Dyslexia Toggle Button -->
+    <button id="dyslexiaToggle" class="dyslexia-toggle">
+        👁️ Dyslexic Friendly
+    </button>
+
     <div class="container">
-        <!-- Header section -->
-        <div class="header">
-            <div class="header-content">
-                <h1>📖 PDF Text-to-Speech</h1>
-                <button id="backBtn" class="back-button">← Back to Upload</button>
+        <!-- Text Display Section (Top) -->
+        <div class="text-section glass">
+            <div class="text-header">
+                <h2><span class="emoji">📖</span>Currently Reading</h2>
+                <span class="block-counter">
+                    Block <span id="currentBlock">1</span> of <span id="totalBlocks">0</span>
+                </span>
             </div>
-            
-            <!-- PDF info display -->
-            <div class="pdf-info" id="pdfInfo">
+            <div class="text-display" id="textDisplay">
+                Select a text block to begin reading...
+            </div>
+        </div>
+
+        <!-- Controls Section (Middle) -->
+        <div class="controls-section glass">
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Playback Controls -->
+            <div class="playback-controls">
+                <button id="prevBtn" class="control-btn" title="Previous">⏮</button>
+                <button id="playBtn" class="control-btn primary" title="Play">▶</button>
+                <button id="stopBtn" class="control-btn" disabled title="Stop">⏹</button>
+                <button id="nextBtn" class="control-btn" title="Next">⏭</button>
+            </div>
+
+            <!-- Voice Settings -->
+            <div class="voice-settings">
+                <div class="setting-control">
+                    <label><span class="emoji">⚡</span>Speed</label>
+                    <input type="range" id="speedRange" min="0.5" max="2" step="0.1" value="1.2">
+                    <span class="setting-value" id="speedValue">1.2x</span>
+                </div>
+                <div class="setting-control">
+                    <label><span class="emoji">🔊</span>Volume</label>
+                    <input type="range" id="volumeRange" min="0" max="1" step="0.1" value="1">
+                    <span class="setting-value" id="volumeValue">100%</span>
+                </div>
+                <div class="setting-control">
+                    <label><span class="emoji">🎤</span>Voice</label>
+                    <select id="voiceSelect">
+                        <option>Loading voices...</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDF Info Section (Bottom) -->
+        <div class="pdf-section glass">
+            <div class="pdf-info">
                 <div class="pdf-details">
-                    <div class="pdf-icon">📄</div>
-                    <div class="pdf-text">
-                        <div class="pdf-name" id="pdfName">Loading...</div>
+                    <span class="pdf-icon">📄</span>
+                    <div>
+                        <div class="pdf-name" id="pdfName">No PDF loaded</div>
                         <div class="pdf-stats" id="pdfStats">0 text blocks</div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- TTS Controls Section -->
-        <div class="tts-controls">
-            <!-- Playback Controls -->
-            <div class="playback-section">
-                <div class="progress-info">
-                    <span class="progress-text">
-                        Block <span id="currentBlock">1</span> of <span id="totalBlocks">0</span>
-                    </span>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
-                </div>
-                
-                <div class="control-buttons">
-                    <button id="prevBtn" class="control-btn" title="Previous Block">⏮️</button>
-                    <button id="playBtn" class="control-btn primary" title="Play">▶️</button>
-                    <button id="pauseBtn" class="control-btn" disabled title="Pause">⏸️</button>
-                    <button id="stopBtn" class="control-btn" disabled title="Stop">⏹️</button>
-                    <button id="nextBtn" class="control-btn" title="Next Block">⏭️</button>
-                </div>
-            </div>
-
-            <!-- Settings Panel -->
-            <div class="settings-section">
-                <h3>🎛️ Voice Settings</h3>
-                <div class="settings-grid">
-                    <div class="setting-group">
-                        <label for="speechRate">Speed</label>
-                        <input type="range" id="speechRate" min="0.5" max="2" step="0.1" value="1">
-                        <span class="setting-value" id="rateValue">1.0x</span>
-                    </div>
-                    
-                    <div class="setting-group">
-                        <label for="speechPitch">Pitch</label>
-                        <input type="range" id="speechPitch" min="0.5" max="2" step="0.1" value="1">
-                        <span class="setting-value" id="pitchValue">1.0</span>
-                    </div>
-                    
-                    <div class="setting-group">
-                        <label for="speechVolume">Volume</label>
-                        <input type="range" id="speechVolume" min="0" max="1" step="0.1" value="1">
-                        <span class="setting-value" id="volumeValue">100%</span>
-                    </div>
-                    
-                    <div class="setting-group">
-                        <label for="voiceSelect">Voice</label>
-                        <select id="voiceSelect">
-                            <option>Loading voices...</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Current Text Display -->
-        <div class="text-display">
-            <div class="text-header">
-                <h3>📝 Currently Reading</h3>
-                <div class="text-controls">
-                    <button id="copyTextBtn" class="text-btn" title="Copy current text">📋</button>
-                    <button id="expandTextBtn" class="text-btn" title="Toggle text size">🔍</button>
-                </div>
-            </div>
-            
-            <div class="current-text" id="currentTextDisplay">
-                <p class="placeholder-text">Select a text block to begin reading...</p>
-            </div>
-        </div>
-
-        <!-- Quick Navigation -->
-        <div class="quick-nav" id="quickNav">
-            <h3>🚀 Quick Navigation</h3>
-            <div class="nav-buttons" id="navButtons">
-                <!-- Navigation buttons will be generated dynamically -->
+                <button class="upload-btn" onclick="window.location.href='index.html'">
+                    📤 Upload New PDF
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Loading overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
+    <!-- Loading Overlay -->
+    <div class="overlay hidden" id="loadingOverlay">
+        <div class="overlay-content">
             <div class="spinner"></div>
-            <p>Loading PDF data...</p>
+            <p style="font-size: 1.1rem; color: #495057;">Loading PDF data...</p>
         </div>
     </div>
 
-    <!-- Error message -->
-    <div class="error-message" id="errorMessage" style="display: none;">
-        <div class="error-content">
-            <h3>❌ No PDF Data Found</h3>
-            <p>Please go back and process a PDF file first.</p>
-            <button onclick="window.location.href='index.html'" class="error-btn">
-                ← Go Back to Upload
+    <!-- Error Overlay -->
+    <div class="overlay hidden" id="errorOverlay">
+        <div class="overlay-content">
+            <h3 style="color: #dc3545; margin-bottom: 15px; font-size: 1.5rem;">❌ No PDF Data Found</h3>
+            <p style="color: #6c757d; margin-bottom: 20px;">Please upload a PDF file first.</p>
+            <button class="upload-btn" onclick="window.location.href='index.html'">
+                Go to Upload
             </button>
         </div>
     </div>
 
-    <!-- JavaScript -->
     <script src="javascript/tts.js"></script>
 </body>
 </html>

@@ -270,7 +270,7 @@ function showStatusMessage(message, type) {
         statusTimeout = setTimeout(() => {
             hideStatusMessage()
             statusTimeout = null
-        }, 5000)
+        }, 3000)
     }
     else if (type === 'error') {
         // Keep error messages visible until user action
