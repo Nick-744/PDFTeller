@@ -29,6 +29,61 @@
         // load pdf data after wiring
         controller.loadPDFData()
 
+            // Add-to-library and save-bookmark button logic (moved from inline HTML)
+            const addBtn = document.getElementById('addToLibraryBtn')
+            const bmBtn = document.getElementById('saveBookmarkBtn')
+
+            function updateButtons() {
+                const has = !!sessionStorage.getItem('pdfProcessedData')
+                if (addBtn) addBtn.style.display = has ? 'inline-block' : 'none'
+                if (bmBtn) bmBtn.style.display = has ? 'inline-block' : 'none'
+            }
+
+            updateButtons()
+
+            if (addBtn) addBtn.addEventListener('click', () => {
+                if (window.libraryAPI && window.libraryAPI.saveCurrentToLibrary) {
+                    window.libraryAPI.saveCurrentToLibrary()
+                } else {
+                    alert('Library unavailable')
+                }
+            })
+
+            if (bmBtn) bmBtn.addEventListener('click', () => {
+                if (!window.libraryAPI || !window.libraryAPI.saveBookmarkForCurrentBook) {
+                    alert('Library unavailable')
+                    return
+                }
+
+                const idxEl = document.getElementById('currentBlock')
+                const idx = idxEl ? parseInt(idxEl.textContent, 10) - 1 : 0
+
+                const defaultName = `Block ${idx + 1}`
+                const name = window.prompt('Enter a name for this bookmark', defaultName)
+                if (name === null) return
+
+                const res = window.libraryAPI.saveBookmarkForCurrentBook(idx, name)
+
+                if (res && res.success) {
+                    if (confirm('Bookmark saved. Open library to view?')) {
+                        window.location.href = 'library.html'
+                    }
+                } else if (res && res.reason === 'not-saved') {
+                    if (confirm('This book is not saved to the library yet. Save now and add bookmark?')) {
+                        const saved = window.libraryAPI.saveCurrentToLibrary && window.libraryAPI.saveCurrentToLibrary()
+                        if (saved) {
+                            const retry = window.libraryAPI.saveBookmarkForCurrentBook(idx, name)
+                            if (retry && retry.success) alert('Bookmark saved')
+                            else alert('Unable to save bookmark')
+                        } else {
+                            alert('Unable to save book to library')
+                        }
+                    }
+                } else {
+                    alert('Unable to save bookmark')
+                }
+            })
+
         // If a start index was provided (e.g., opened from Library bookmark), jump there
         const startIndexRaw = sessionStorage.getItem('pdfStartIndex')
         if (startIndexRaw !== null) {

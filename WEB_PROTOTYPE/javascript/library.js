@@ -58,7 +58,7 @@ function renderLibrary() {
             renderLibrary()
         })
 
-        // render bookmarks (only one expected per book)
+        // render bookmarks (supports multiple bookmarks per book)
         if (book.bookmarks && book.bookmarks.length) {
             book.bookmarks.forEach((bm) => {
                 const bmEl = document.createElement('span')
@@ -149,28 +149,42 @@ function saveCurrentToLibrary() {
     return book
 }
 
-// Save a single bookmark for the current saved book (one bookmark per book)
+// Save a single bookmark for the current saved book (supports multiple bookmarks)
 function saveBookmarkForCurrentBook(index, name) {
     const raw = sessionStorage.getItem('pdfProcessedData')
-    if (!raw) {
-        return { success: false, reason: 'no-data' }
-    }
+    if (!raw) return { success: false, reason: 'no-data' }
 
     const data = JSON.parse(raw)
-    const lib = loadLibrary()
-    const matchIndex = lib.findIndex(b => b.filename === data.filename && b.fileSize === data.fileSize)
+    let lib = loadLibrary()
+    let matchIndex = lib.findIndex(b => b.filename === data.filename && b.fileSize === data.fileSize)
+
+    // If not saved yet, try auto-saving so the bookmark can be persisted
     if (matchIndex === -1) {
-        return { success: false, reason: 'not-saved' }
+        const saved = saveCurrentToLibrary()
+        if (!saved) return { success: false, reason: 'not-saved' }
+        lib = loadLibrary()
+        matchIndex = lib.findIndex(b => b.filename === data.filename && b.fileSize === data.fileSize)
+        if (matchIndex === -1) return { success: false, reason: 'not-saved' }
     }
 
     const book = lib[matchIndex]
-    // Keep only one bookmark per book: overwrite or set
     const bmName = name || `Bookmark ${index + 1}`
-    book.bookmarks = [{ name: bmName, index: index }]
-    saveLibrary(lib)
-    renderLibrary()
-    return { success: true, bookId: book.id }
-}
+    book.bookmarks = book.bookmarks || []
+
+    const existing = book.bookmarks.find(b => b.index === index)
+    
+    if (existing) {
+        existing.name = bmName
+    } else {
+        book.bookmarks.push({ name: bmName, index })
+    }
+
+        // Persist updated library
+        const updated = lib.map(b => (b.id === book.id ? book : b))
+        saveLibrary(updated)
+        renderLibrary()
+        return { success: true, bookId: book.id }
+    }
 
 // Expose a small API for other pages
 if (typeof window !== 'undefined') {

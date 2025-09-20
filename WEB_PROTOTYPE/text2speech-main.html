@@ -118,51 +118,7 @@
         </div>
     </div>
 
-    <script>
-        // Show Add to Library / Save Bookmark buttons if processed data exists
-        document.addEventListener('DOMContentLoaded', () => {
-            const addBtn = document.getElementById('addToLibraryBtn')
-            const bmBtn = document.getElementById('saveBookmarkBtn')
-
-            function updateButtons() {
-                const has = !!sessionStorage.getItem('pdfProcessedData')
-                if (addBtn) addBtn.style.display = has ? 'inline-block' : 'none'
-                if (bmBtn) bmBtn.style.display = has ? 'inline-block' : 'none'
-            }
-
-            updateButtons()
-
-            // Add handlers
-            addBtn && addBtn.addEventListener('click', () => {
-                if (window.libraryAPI && window.libraryAPI.saveCurrentToLibrary) {
-                    window.libraryAPI.saveCurrentToLibrary()
-                } else {
-                    alert('Library unavailable')
-                }
-            })
-
-            bmBtn && bmBtn.addEventListener('click', () => {
-                // Attempt to save a bookmark for the current saved book
-                if (!window.libraryAPI || !window.libraryAPI.saveBookmarkForCurrentBook) {
-                    alert('Library unavailable')
-                    return
-                }
-
-                const idxEl = document.getElementById('currentBlock')
-                const idx = idxEl ? parseInt(idxEl.textContent, 10) - 1 : 0
-                const name = `Block ${idx + 1}`
-                const res = window.libraryAPI.saveBookmarkForCurrentBook(idx, name)
-                if (res && res.success) {
-                    alert('Bookmark saved')
-                } else if (res.reason === 'not-saved') {
-                    alert('Book is not saved to library yet. Save it first.')
-                } else {
-                    alert('Unable to save bookmark')
-                }
-            })
-        })
-    </script>
-
+    <script src="javascript/library_api.js"></script>
     <script src="javascript/tts-core.js"></script>
     <script src="javascript/tts-page.js"></script>
 </body>

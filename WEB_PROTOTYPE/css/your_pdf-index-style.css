@@ -7,12 +7,98 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
+    /* animated gradient background (intensified) */
+    background: linear-gradient(90deg, #6a8eff 0%, #8b5cf6 20%, #34d399 40%, #ff6fa3 60%, #ffd166 80%, #6a8eff 100%);
+    background-size: 900% 900%;
+    animation: gradientShift 6s ease infinite;
+    will-change: background-position, filter;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    20% { background-position: 30% 20%; }
+    40% { background-position: 60% 40%; }
+    60% { background-position: 80% 60%; }
+    80% { background-position: 60% 80%; }
+    100% { background-position: 0% 50%; }
+}
+
+    /* stronger hue rotation to make it pop */
+    @keyframes hueSpin {
+        0% { filter: hue-rotate(0deg) saturate(1); }
+        50% { filter: hue-rotate(30deg) saturate(1.25); }
+        100% { filter: hue-rotate(0deg) saturate(1); }
+    }
+
+    /* radial light overlay for depth */
+    body::before {
+        content: '';
+        position: fixed;
+        left: -20%;
+        top: -20%;
+        width: 140%;
+        height: 140%;
+        background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.12), transparent 20%), radial-gradient(circle at 80% 80%, rgba(0,0,0,0.06), transparent 30%);
+        pointer-events: none;
+        z-index: -1;
+        mix-blend-mode: screen;
+        animation: overlayFloat 12s ease-in-out infinite;
+    }
+
+    /* colorful moving blob for strong visual impact */
+    body::after {
+        content: '';
+        position: fixed;
+        right: -10%;
+        bottom: -10%;
+        width: 50vmax;
+        height: 50vmax;
+        background: radial-gradient(circle at 30% 30%, rgba(255,120,180,0.28), rgba(120,80,255,0.18) 30%, rgba(40,200,150,0.12) 60%, transparent 70%);
+        z-index: -2;
+        pointer-events: none;
+        filter: blur(40px) saturate(1.3);
+        transform: translate3d(0,0,0);
+        animation: blobMove 8s ease-in-out infinite;
+        mix-blend-mode: screen;
+    }
+
+    @keyframes blobMove {
+        0% { transform: translate(0, 0) scale(1); opacity: 0.9; }
+        25% { transform: translate(-6%, -4%) scale(1.05); opacity: 0.95; }
+        50% { transform: translate(-12%, -8%) scale(1.08); opacity: 0.9; }
+        75% { transform: translate(-6%, -2%) scale(1.03); opacity: 0.95; }
+        100% { transform: translate(0, 0) scale(1); opacity: 0.9; }
+    }
+
+    @keyframes overlayFloat {
+        0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+        50% { transform: translateY(-8px) scale(1.02) rotate(1deg); opacity: 0.95; }
+        100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    /* combine hue spin and gradient on body */
+    body {
+        animation: gradientShift 6s ease infinite, hueSpin 18s ease-in-out infinite;
+    }
+
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    body {
+        animation: none;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-size: cover;
+    }
+    body::before {
+        display: none;
+    }
+    body::after {
+        display: none;
+    }
 }
 
 /* Main container styling */
@@ -23,6 +109,7 @@ body {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     max-width: 500px;
     width: 100%;
+    position: relative; /* needed for absolutely positioned children */
 }
 
 /* Header section styles */
@@ -45,7 +132,7 @@ body {
 
 /* Upload section container */
 .upload-section {
-    margin-bottom: 20px;
+    margin-bottom: 64px;
 }
 
 /* Custom upload button styling */
@@ -341,5 +428,48 @@ body {
         font-size: 1rem;
         width: 100%;
         justify-content: center;
+    }
+}
+
+/* Library button styles */
+.library-button {
+    display: inline-block;
+    margin: 20px auto 0 auto;
+    padding: 12px 18px;
+    background: #667eea;
+    color: #fff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s ease, transform 0.12s ease;
+    box-shadow: 0 8px 22px rgba(25, 118, 210, 0.12);
+}
+
+.library-button:hover,
+.library-button:focus {
+    background: #5a6fd8;
+}
+
+/* Place the library button centered at the bottom of the container */
+.container .library-button {
+    position: absolute;
+    bottom: 40px;
+    right: 40px;
+    display: inline-block;
+    margin: 0;
+    max-width: 220px;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .library-button {
+        width: auto;
+        box-shadow: none;
+        bottom: 12px;
+        right: 12px;
+        padding: 10px 14px;
+    }
+    .container {
+        padding-bottom: 64px; /* make room for the button */
     }
 }

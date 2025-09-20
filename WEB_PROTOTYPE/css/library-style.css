@@ -31,7 +31,7 @@ body {
 .book {
     display: flex;
     gap: 12px;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     padding: 16px;
     border-radius: 12px;
@@ -43,7 +43,8 @@ body {
 .book-info {
     display:flex;
     gap:12px;
-    align-items:flex-start;
+    align-items:center;
+    min-width: 0; /* allow ellipsis/text wrap */
 }
 
 .book-meta {
@@ -63,7 +64,7 @@ body {
 
 .bookmark-list { margin-top: 8px; }
 .bookmark {
-    display:inline-block;
+    display:inline-flex;
     background: #eef6ff;
     color: #155e9b;
     padding: 6px 10px;
@@ -80,12 +81,17 @@ body {
     border-radius: 8px;
     border: none;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .open-btn {
-    background: linear-gradient(135deg,#28a745,#20c997);
+    display: inline-block;
+    text-decoration: none;
+    background: #667eea;
     color: white;
+    padding: 12px 18px;
+    border-radius: 10px;
+    box-shadow: 0 8px 22px rgba(25, 118, 210, 0.12);
 }
 
 .delete-btn {
@@ -95,9 +101,12 @@ body {
 }
 
 #saveCurrentBtn {
-    background: linear-gradient(135deg,#667eea,#764ba2);
+    background: #667eea;
     color: white;
     margin-top: 12px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    box-shadow: 0 8px 22px rgba(25, 118, 210, 0.12);
 }
 
 .empty-note {
@@ -105,10 +114,25 @@ body {
     padding: 16px;
     border-radius: 10px;
     background: #fbfbfb;
-    border: 1px dashed rgba(0,0,0,0.04);
+    border: 1px dashed rgba(0, 0, 0, 0.04);
 }
 
 @media (max-width: 720px) {
     .book { flex-direction: column; align-items: stretch }
-    .book-actions { margin-top: 12px; display:flex; justify-content:flex-end }
+    .book-actions { margin-top: 12px; display:flex; justify-content:flex-end; gap:8px }
+    .bookmark-list { margin-top: 12px }
+}
+
+.library-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.library-header .actions {
+    display:flex;
+    gap:20px;
+    align-items:center;
 }

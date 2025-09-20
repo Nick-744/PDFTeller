@@ -264,10 +264,12 @@ body {
     border-radius: 10px;
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
 }
 
 .setting-control input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
+    appearance: none;
     width: 22px;
     height: 22px;
     background: linear-gradient(135deg, #667eea, #764ba2);
@@ -381,6 +383,31 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
 }
+
+/* Add / Bookmark buttons on TTS page */
+#addToLibraryBtn, #saveBookmarkBtn {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+#addToLibraryBtn {
+    background: linear-gradient(135deg,#6f42c1,#20c997);
+    color: white;
+}
+
+#addToLibraryBtn:hover { transform: translateY(-2px); }
+
+#saveBookmarkBtn {
+    background: #fff5f5;
+    color: #c82333;
+    border: 1px solid rgba(200,30,40,0.06);
+}
+
+#saveBookmarkBtn:hover { transform: translateY(-2px); }
 
 /* Loading & Error States */
 .overlay {
