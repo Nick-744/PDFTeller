@@ -22,7 +22,7 @@ def process_pdf():
         return (jsonify({'error': 'Filename required'}), 400);
     
     filename = data['filename']
-    pdf_path = Path(__file__).parent.parent / filename
+    pdf_path = Path(__file__).parent.parent / 'DATA' / filename
     
     if not pdf_path.exists():
         return (jsonify({'error': f'File {filename} not found'}), 404);

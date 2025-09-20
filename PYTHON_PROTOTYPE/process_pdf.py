@@ -46,7 +46,7 @@ def process_pdf_text_with_structure(filename: str) -> list[str]:
 if __name__ == '__main__':
     base_path      = Path(__file__).parent.parent # Go up 1 directory!
     processed_text = process_pdf_text_with_structure(
-        base_path / 'Understanding_Climate_Change.pdf'
+        base_path / 'DATA' / 'Understanding_Climate_Change.pdf'
     )
     for (i, sentence) in enumerate(processed_text):
         print(f"{i+1}: {sentence}")
