@@ -53,7 +53,7 @@ fun processPdfTextWithStructure(filePath: File): ArrayList<String>
         {
             val blockText = currentBlock.joinToString(" ")
             val sentences = tokenizer.sentDetect(blockText)
-            processedText.addAll(currentBlock)
+            processedText.addAll(sentences)
         }
     }
 
