@@ -1,0 +1,71 @@
+import org.apache.pdfbox.text.PDFTextStripper
+import org.apache.pdfbox.Loader
+import java.io.File
+
+import opennlp.tools.sentdetect.SentenceDetectorME
+import opennlp.tools.sentdetect.SentenceModel
+
+fun processPdfTextWithStructure(filePath: File): ArrayList<String>
+{
+    val document      = Loader.loadPDF(filePath)
+    val processedText = ArrayList<String>()
+
+    val stripper  = PDFTextStripper()
+    val model     = SentenceModel(File("C:/Users/nick1/Documents/GitHub/PDFTeller/KOTLIN_PROTOTYPE/src/main/resources/opennlp-en-ud-ewt-sentence-1.3-2.5.4.bin"))
+    val tokenizer = SentenceDetectorME(model)
+
+    for (currentPage in 1..document.numberOfPages)
+    {
+        // Get lines from the page
+        stripper.startPage = currentPage
+        stripper.endPage   = currentPage
+        val pageText       = stripper.getText(document)
+        val lines          = pageText.split(" \r\n", " \n", "\r\n", "\n").toTypedArray()
+
+        val currentBlock = ArrayList<String>() // To accumulate lines of regular text!
+        for (line in lines)
+        {
+            line.trimMargin()
+
+            // STUPID PDFs sometimes have empty lines...
+            if (line.isEmpty()) continue
+
+            // Check if this might be a chapter/section header!
+            if ((line.length < 50) && !line.endsWith("."))
+            {
+                // --- <> Process accumulated text <> --- //
+                if (!currentBlock.isEmpty())
+                {
+                    val blockText = currentBlock.joinToString(" ")
+                    val sentences = tokenizer.sentDetect(blockText)
+                    processedText.addAll(sentences)
+                    currentBlock.clear()
+                }
+
+                // Add the header as its own element...
+                processedText.add(line)
+            }
+            else currentBlock.add(line) // Will be processed later
+        }
+
+        // Process any remaining text
+        if (!currentBlock.isEmpty())
+        {
+            val blockText = currentBlock.joinToString(" ")
+            val sentences = tokenizer.sentDetect(blockText)
+            processedText.addAll(currentBlock)
+        }
+    }
+
+    document.close()
+
+    return processedText
+}
+
+fun main()
+{
+    val temp = processPdfTextWithStructure(File("C:/Users/nick1/Documents/GitHub/pdf-gpt-rag/PDF_SOURCE/Understanding_Climate_Change.pdf"))
+
+    for (i in 0..20)
+        println("${(i + 1).toString().padStart(2, ' ')}: ${temp[i]}")
+}
