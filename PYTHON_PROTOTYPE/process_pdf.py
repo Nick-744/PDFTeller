@@ -3,10 +3,10 @@ from pathlib import Path
 import pymupdf
 
 def process_pdf_text_with_structure(filename: str) -> list[str]:
-    doc            = pymupdf.open(filename)
+    document       = pymupdf.open(filename)
     processed_text = []
     
-    for page in doc:
+    for page in document:
         # Get lines from the page
         page_text = page.get_text()
         lines     = page_text.split('\n')
@@ -39,7 +39,7 @@ def process_pdf_text_with_structure(filename: str) -> list[str]:
             sentences  = sent_tokenize(block_text)
             processed_text.extend(sentences)
     
-    doc.close()
+    document.close()
 
     return processed_text;
 
@@ -49,6 +49,6 @@ if __name__ == '__main__':
         base_path / 'DATA' / 'Understanding_Climate_Change.pdf'
     )
     for (i, sentence) in enumerate(processed_text):
-        print(f"{i+1}: {sentence}")
+        print(f'{i+1:2}: {sentence}')
         if i >= 20:
             break;
