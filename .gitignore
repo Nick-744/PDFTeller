@@ -267,3 +267,5 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+/KOTLIN_PROTOTYPE/.idea
