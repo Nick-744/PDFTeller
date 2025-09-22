@@ -11,8 +11,14 @@ fun processPdfTextWithStructure(filePath: File): ArrayList<String>
     val processedText = ArrayList<String>()
 
     val stripper  = PDFTextStripper()
-    val model     = SentenceModel(File("C:/Users/nick1/Documents/GitHub/PDFTeller/KOTLIN_PROTOTYPE/src/main/resources/opennlp-en-ud-ewt-sentence-1.3-2.5.4.bin"))
-    val tokenizer = SentenceDetectorME(model)
+
+    // IntelliJ in debug mode... creating a File(...) works fine!
+    // val model     = SentenceModel(File("C:/Users/nick1/Documents/..."))
+
+    // In a JAR [packaged project], resources aren’t files [compressed entries]...
+    val modelStream = object {}.javaClass.getResourceAsStream("/opennlp-en-ud-ewt-sentence-1.3-2.5.4.bin")
+    val model       = SentenceModel(modelStream)
+    val tokenizer   = SentenceDetectorME(model)
 
     for (currentPage in 1..document.numberOfPages)
     {
@@ -64,7 +70,9 @@ fun processPdfTextWithStructure(filePath: File): ArrayList<String>
 
 fun main()
 {
-    val temp = processPdfTextWithStructure(File("C:/Users/nick1/Documents/GitHub/pdf-gpt-rag/PDF_SOURCE/Understanding_Climate_Change.pdf"))
+    val temp = processPdfTextWithStructure(
+        File("C:/Users/nick1/Documents/GitHub/pdf-gpt-rag/PDF_SOURCE/Understanding_Climate_Change.pdf")
+    )
 
     for (i in 0..20)
         println("${(i + 1).toString().padStart(2, ' ')}: ${temp[i]}")
