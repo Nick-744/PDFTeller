@@ -1,0 +1,30 @@
+import nl.marc_apps.tts.experimental.ExperimentalDesktopTarget
+import nl.marc_apps.tts.TextToSpeechInstance
+import nl.marc_apps.tts.TextToSpeechFactory
+
+import kotlinx.coroutines.runBlocking
+// https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/run-blocking.html
+
+// - Note -
+//   A suspend function is a function that can be paused
+// and resumed later without blocking a thread!
+// https://medium.com/@guruprasadhegde4/kotlin-coroutines-suspend-function-f98ebbbd3bd7
+
+@OptIn(ExperimentalDesktopTarget::class)
+class TextToSpeechHelper
+{
+    private val ttsEngineCreator = TextToSpeechFactory()
+    private var ttsEngine: TextToSpeechInstance? = null
+
+    init {
+        runBlocking {
+            ttsEngine = ttsEngineCreator.create().getOrNull()
+        }
+    }
+
+    fun speak(sentence: String) {
+        runBlocking {
+            ttsEngine!!.say(sentence)
+        }
+    }
+}

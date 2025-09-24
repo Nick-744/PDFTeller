@@ -7,10 +7,11 @@ fun main()
         return
     }
 
-    val sentences = processPdfTextWithStructure(userFile)
+    val sentences    = processPdfTextWithStructure(userFile)
+    val speechHelper = TextToSpeechHelper()
     for (i in 0..10)
     {
         println(sentences[i])
-        textToSpeech(sentences[i])
+        speechHelper.speak(sentences[i])
     }
 }
