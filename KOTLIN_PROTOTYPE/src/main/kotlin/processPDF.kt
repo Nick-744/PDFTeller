@@ -71,9 +71,12 @@ fun processPdfTextWithStructure(filePath: File): ArrayList<String>
 fun main()
 {
     val temp = processPdfTextWithStructure(
-        File("C:/Users/nick1/Documents/GitHub/pdf-gpt-rag/PDF_SOURCE/Understanding_Climate_Change.pdf")
+        File("C:/Users/nick1/Documents/GitHub/PDFTeller/DATA/Understanding_Climate_Change.pdf")
     )
 
     for (i in 0..20)
+    {
         println("${(i + 1).toString().padStart(2, ' ')}: ${temp[i]}")
+        textToSpeech(temp[i])
+    }
 }
