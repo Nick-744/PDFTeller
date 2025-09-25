@@ -10,7 +10,7 @@ fun processPdfTextWithStructure(filePath: File): ArrayList<String>
     val document      = Loader.loadPDF(filePath)
     val processedText = ArrayList<String>()
 
-    val stripper  = PDFTextStripper()
+    val stripper = PDFTextStripper()
 
     // IntelliJ in debug mode... creating a File(...) works fine!
     // val model     = SentenceModel(File("C:/Users/nick1/Documents/..."))

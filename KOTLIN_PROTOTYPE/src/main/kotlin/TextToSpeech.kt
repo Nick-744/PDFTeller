@@ -27,4 +27,10 @@ class TextToSpeechHelper
             ttsEngine!!.say(sentence)
         }
     }
+
+    fun stop() {
+        runBlocking {
+            ttsEngine!!.stop()
+        }
+    }
 }
