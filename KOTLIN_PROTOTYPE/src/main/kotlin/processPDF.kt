@@ -1,9 +1,8 @@
-import org.apache.pdfbox.text.PDFTextStripper
-import org.apache.pdfbox.Loader
-import java.io.File
-
 import opennlp.tools.sentdetect.SentenceDetectorME
 import opennlp.tools.sentdetect.SentenceModel
+import org.apache.pdfbox.Loader
+import org.apache.pdfbox.text.PDFTextStripper
+import java.io.File
 
 fun processPdfTextWithStructure(filePath: File): ArrayList<String>
 {
@@ -13,7 +12,7 @@ fun processPdfTextWithStructure(filePath: File): ArrayList<String>
     val stripper = PDFTextStripper()
 
     // IntelliJ in debug mode... creating a File(...) works fine!
-    // val model     = SentenceModel(File("C:/Users/nick1/Documents/..."))
+    // val model = SentenceModel(File("C:/Users/nick1/Documents/..."))
 
     // In a JAR [packaged project], resources aren’t files [compressed entries]...
     val modelStream = object {}.javaClass.getResourceAsStream("/opennlp-en-ud-ewt-sentence-1.3-2.5.4.bin")
