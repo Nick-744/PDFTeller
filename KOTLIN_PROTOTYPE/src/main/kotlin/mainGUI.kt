@@ -31,6 +31,13 @@ data class Book(
     val originalPdfName: String
 )
 
+data class Checkpoint(
+    val bookTitle: String,
+    val sentenceIndex: Int,
+    val savedDate: LocalDateTime,
+    val filePath: String
+)
+
 class MainApp : Application() {
     private val ttsHelper = TextToSpeechHelper()
     private val spokenSentences: ObservableList<String> = FXCollections.observableArrayList()
@@ -39,9 +46,11 @@ class MainApp : Application() {
     private lateinit var statusLabel: Label
     private lateinit var playButton: Button
     private lateinit var stopButton: Button
+    private lateinit var checkpointButton: Button
 
     // Library
     private val library: ObservableList<Book> = FXCollections.observableArrayList()
+    private val checkpoints: ObservableList<Checkpoint> = FXCollections.observableArrayList()
     private val libraryDir = File(System.getProperty("user.home"), ".pdfteller_library")
 
     @Volatile
@@ -60,6 +69,7 @@ class MainApp : Application() {
             libraryDir.mkdirs()
         }
         loadLibrary()
+        loadCheckpoints()
     }
 
     override fun start(primaryStage: Stage) {
@@ -79,7 +89,7 @@ class MainApp : Application() {
             VBox.setVgrow(this, javafx.scene.layout.Priority.ALWAYS)
         }
 
-        // Play/Stop control buttons
+        // Play/Stop/Checkpoint control buttons
         playButton = Button("▶ Play").apply {
             prefWidth = 100.0
             setOnAction { handlePlay() }
@@ -91,7 +101,13 @@ class MainApp : Application() {
             setOnAction { handleStop() }
         }
 
-        val controlButtons = HBox(10.0, playButton, stopButton).apply {
+        checkpointButton = Button("🔖 Save Checkpoint").apply {
+            prefWidth = 150.0
+            isDisable = true
+            setOnAction { saveCheckpoint() }
+        }
+
+        val controlButtons = HBox(10.0, playButton, stopButton, checkpointButton).apply {
             alignment = Pos.CENTER
             padding = Insets(10.0, 10.0, 20.0, 10.0)
         }
@@ -194,6 +210,83 @@ class MainApp : Application() {
         Platform.runLater {
             playButton.isDisable = isPlaying || currentSentences.isEmpty()
             stopButton.isDisable = !isPlaying
+            checkpointButton.isDisable = currentSentences.isEmpty() || currentBookTitle == null
+        }
+    }
+
+    private fun saveCheckpoint() {
+        val bookTitle = currentBookTitle ?: return
+
+        // Find the book's file path
+        val book = library.find { it.title == bookTitle } ?: return
+
+        val checkpoint = Checkpoint(
+            bookTitle = bookTitle,
+            sentenceIndex = currentIndex,
+            savedDate = LocalDateTime.now(),
+            filePath = book.filePath
+        )
+
+        // Remove old checkpoints for the same book
+        checkpoints.removeIf { it.bookTitle == bookTitle }
+        checkpoints.add(checkpoint)
+        saveCheckpointsMetadata()
+
+        Platform.runLater {
+            statusLabel.text = "Checkpoint saved at sentence ${currentIndex + 1}"
+            showTemporaryMessage("✓ Checkpoint saved!", 2000)
+        }
+    }
+
+    private fun showTemporaryMessage(message: String, durationMs: Long) {
+        val originalText = statusLabel.text
+        statusLabel.text = message
+        GlobalScope.launch(Dispatchers.IO) {
+            delay(durationMs)
+            Platform.runLater {
+                if (statusLabel.text == message) {
+                    statusLabel.text = originalText
+                }
+            }
+        }
+    }
+
+    private fun loadCheckpoints() {
+        val checkpointsFile = File(libraryDir, "checkpoints.txt")
+        if (!checkpointsFile.exists()) return
+
+        try {
+            val lines = checkpointsFile.readLines()
+            lines.forEach { line ->
+                if (line.contains("title:")) {
+                    val parts = line.split("|")
+                    if (parts.size >= 4) {
+                        val checkpoint = Checkpoint(
+                            bookTitle = parts[0].substringAfter("title:"),
+                            sentenceIndex = parts[1].substringAfter("index:").toInt(),
+                            savedDate = LocalDateTime.parse(parts[2].substringAfter("date:")),
+                            filePath = parts[3].substringAfter("path:")
+                        )
+                        if (File(checkpoint.filePath).exists()) {
+                            checkpoints.add(checkpoint)
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            // Failed to load checkpoints
+        }
+    }
+
+    private fun saveCheckpointsMetadata() {
+        val checkpointsFile = File(libraryDir, "checkpoints.txt")
+        try {
+            val content = checkpoints.joinToString("\n") { checkpoint ->
+                "title:${checkpoint.bookTitle}|index:${checkpoint.sentenceIndex}|date:${checkpoint.savedDate}|path:${checkpoint.filePath}"
+            }
+            checkpointsFile.writeText(content)
+        } catch (e: Exception) {
+            // Failed to save checkpoints
         }
     }
 
@@ -281,11 +374,9 @@ class MainApp : Application() {
         if (!metadataFile.exists()) return
 
         try {
-            // Simple parsing (you might want to use a JSON library)
             val lines = metadataFile.readLines()
             lines.forEach { line ->
                 if (line.contains("title:")) {
-                    // Parse each book entry (simplified - use proper JSON parsing in production)
                     val parts = line.split("|")
                     if (parts.size >= 5) {
                         val book = Book(
@@ -325,6 +416,32 @@ class MainApp : Application() {
             initOwner(primaryStage)
         }
 
+        val tabPane = TabPane()
+
+        // Books Tab
+        val booksTab = Tab("Books").apply {
+            isClosable = false
+            content = createBooksTab(dialog)
+        }
+
+        // Checkpoints Tab
+        val checkpointsTab = Tab("Checkpoints").apply {
+            isClosable = false
+            content = createCheckpointsTab(dialog)
+        }
+
+        tabPane.tabs.addAll(booksTab, checkpointsTab)
+
+        val root = BorderPane().apply {
+            center = tabPane
+            padding = Insets(10.0)
+        }
+
+        dialog.scene = Scene(root, 500.0, 550.0)
+        dialog.show()
+    }
+
+    private fun createBooksTab(dialog: Stage): VBox {
         val listView = ListView(library).apply {
             setCellFactory {
                 object : ListCell<Book>() {
@@ -350,7 +467,6 @@ class MainApp : Application() {
                 }
             }
             prefHeight = 400.0
-            prefWidth = 400.0
         }
 
         val loadButton = Button("Load Selected").apply {
@@ -358,7 +474,7 @@ class MainApp : Application() {
             setOnAction {
                 val selected = listView.selectionModel.selectedItem
                 if (selected != null) {
-                    loadBookFromLibrary(selected)
+                    loadBookFromLibrary(selected, 0)
                     dialog.close()
                 }
             }
@@ -384,21 +500,109 @@ class MainApp : Application() {
             padding = Insets(10.0)
         }
 
-        val root = BorderPane().apply {
-            center = listView
-            bottom = buttonBar
+        return VBox().apply {
+            children.addAll(listView, buttonBar)
+            VBox.setVgrow(listView, javafx.scene.layout.Priority.ALWAYS)
+        }
+    }
+
+    private fun createCheckpointsTab(dialog: Stage): VBox {
+        val listView = ListView(checkpoints).apply {
+            setCellFactory {
+                object : ListCell<Checkpoint>() {
+                    override fun updateItem(item: Checkpoint?, empty: Boolean) {
+                        super.updateItem(item, empty)
+                        if (empty || item == null) {
+                            text = null
+                            graphic = null
+                        } else {
+                            val vbox = VBox(5.0).apply {
+                                children.addAll(
+                                    Label(item.bookTitle).apply {
+                                        style = "-fx-font-weight: bold; -fx-font-size: 14px;"
+                                    },
+                                    Label("At sentence: ${item.sentenceIndex + 1}"),
+                                    Label("Saved: ${item.savedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))}")
+                                )
+                                padding = Insets(5.0)
+                            }
+                            graphic = vbox
+                        }
+                    }
+                }
+            }
+            prefHeight = 400.0
+        }
+
+        val loadButton = Button("Load Checkpoint").apply {
+            prefWidth = 130.0
+            setOnAction {
+                val selected = listView.selectionModel.selectedItem
+                if (selected != null) {
+                    loadCheckpoint(selected)
+                    dialog.close()
+                }
+            }
+        }
+
+        val deleteButton = Button("Delete").apply {
+            prefWidth = 120.0
+            setOnAction {
+                val selected = listView.selectionModel.selectedItem
+                if (selected != null) {
+                    checkpoints.remove(selected)
+                    saveCheckpointsMetadata()
+                }
+            }
+        }
+
+        val closeButton = Button("Close").apply {
+            prefWidth = 120.0
+            setOnAction { dialog.close() }
+        }
+
+        val buttonBar = HBox(10.0, loadButton, deleteButton, closeButton).apply {
+            alignment = Pos.CENTER
             padding = Insets(10.0)
         }
 
-        dialog.scene = Scene(root, 450.0, 500.0)
-        dialog.show()
+        return VBox().apply {
+            children.addAll(listView, buttonBar)
+            VBox.setVgrow(listView, javafx.scene.layout.Priority.ALWAYS)
+        }
     }
 
-    private fun loadBookFromLibrary(book: Book) {
+    private fun loadCheckpoint(checkpoint: Checkpoint) {
+        try {
+            val sentences = File(checkpoint.filePath).readLines()
+            currentSentences = sentences
+            currentIndex = checkpoint.sentenceIndex
+            currentBookTitle = checkpoint.bookTitle
+
+            Platform.runLater {
+                spokenSentences.clear()
+                // Add previous sentences to history
+                for (i in 0 until checkpoint.sentenceIndex) {
+                    if (i < sentences.size) {
+                        spokenSentences.add(sentences[i])
+                    }
+                }
+                statusLabel.text = "Loaded checkpoint: ${checkpoint.bookTitle} at sentence ${checkpoint.sentenceIndex + 1}"
+                currentSentenceLabel.text = "Ready to resume from checkpoint"
+                updateButtonStates()
+            }
+        } catch (e: Exception) {
+            Platform.runLater {
+                statusLabel.text = "Failed to load checkpoint"
+            }
+        }
+    }
+
+    private fun loadBookFromLibrary(book: Book, startIndex: Int = 0) {
         try {
             val sentences = File(book.filePath).readLines()
             currentSentences = sentences
-            currentIndex = 0
+            currentIndex = startIndex
             currentBookTitle = book.title
 
             Platform.runLater {
@@ -426,7 +630,10 @@ class MainApp : Application() {
             try {
                 File(book.filePath).delete()
                 library.remove(book)
+                // Also remove associated checkpoints
+                checkpoints.removeIf { it.bookTitle == book.title }
                 saveLibraryMetadata()
+                saveCheckpointsMetadata()
             } catch (e: Exception) {
                 // Failed to delete
             }
