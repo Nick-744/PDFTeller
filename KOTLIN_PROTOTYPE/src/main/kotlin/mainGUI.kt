@@ -47,6 +47,10 @@ class MainApp : Application() {
     private lateinit var playButton: Button
     private lateinit var stopButton: Button
     private lateinit var checkpointButton: Button
+    private lateinit var dyslexiaToggle: ToggleButton
+    private var baseSentenceStyle: String = ""
+    private lateinit var topHalf: VBox
+    private var baseTopHalfStyle: String = ""
 
     // Library
     private val library: ObservableList<Book> = FXCollections.observableArrayList()
@@ -75,7 +79,9 @@ class MainApp : Application() {
     override fun start(primaryStage: Stage) {
         // Current sentence display - will take up half the window
         currentSentenceLabel = Label("No sentence playing...").apply {
-            style = "-fx-font-size: 24px; -fx-font-weight: bold; -fx-padding: 20px;"
+            style = "-fx-font-size: 24px; -fx-padding: 20px;"
+            // Save the base style so we can restore it when turning off dyslexia mode
+            baseSentenceStyle = style
             isWrapText = true
             alignment = Pos.CENTER
             maxWidth = Double.MAX_VALUE
@@ -107,16 +113,27 @@ class MainApp : Application() {
             setOnAction { saveCheckpoint() }
         }
 
-        val controlButtons = HBox(10.0, playButton, stopButton, checkpointButton).apply {
+        // Dyslexia-friendly toggle
+        dyslexiaToggle = ToggleButton("Dyslexia-friendly").apply {
+            prefWidth = 160.0
+            isDisable = false
+            setOnAction {
+                toggleDyslexiaMode(isSelected)
+            }
+        }
+
+        val controlButtons = HBox(10.0, playButton, stopButton, checkpointButton, dyslexiaToggle).apply {
             alignment = Pos.CENTER
             padding = Insets(10.0, 10.0, 20.0, 10.0)
         }
 
         // Top half: Current sentence + controls
-        val topHalf = VBox().apply {
+        topHalf = VBox().apply {
             children.addAll(currentSentenceContainer, controlButtons)
             prefHeightProperty().bind(primaryStage.heightProperty().divide(2))
             style = "-fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;"
+            // save base style for restoring later
+            baseTopHalfStyle = style
         }
 
         // Sentence history list
@@ -177,10 +194,31 @@ class MainApp : Application() {
             children.addAll(topHalf, bottomHalf)
         }
 
-        val scene = Scene(root, 500.0, 700.0)
+        val scene = Scene(root, 800.0, 710.0)
         primaryStage.title = "PDFTeller"
         primaryStage.scene = scene
         primaryStage.show()
+    }
+
+    private fun toggleDyslexiaMode(enabled: Boolean) {
+        Platform.runLater {
+            if (enabled) {
+                // Set background, text color and dyslexia font as requested
+                // Background color: #1d0f0f, Text color: #a08060, Font: OpenDyslexic3
+                // Apply to the top half background and request the font-family so children inherit where possible
+                if (this@MainApp::topHalf.isInitialized) {
+                    topHalf.style = "$baseTopHalfStyle -fx-background-color: #1d0f0f;"
+                }
+                // Apply text color and font for the current sentence label
+                currentSentenceLabel.style = "$baseSentenceStyle -fx-text-fill: #a08060; -fx-font-family: 'OpenDyslexic3';"
+            } else {
+                // Restore base styles
+                if (this@MainApp::topHalf.isInitialized) {
+                    topHalf.style = baseTopHalfStyle
+                }
+                currentSentenceLabel.style = baseSentenceStyle
+            }
+        }
     }
 
     private fun handlePlay() {
