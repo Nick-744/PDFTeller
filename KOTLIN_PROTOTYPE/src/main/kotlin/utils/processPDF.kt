@@ -1,3 +1,5 @@
+package utils
+
 import opennlp.tools.sentdetect.SentenceDetectorME
 import opennlp.tools.sentdetect.SentenceModel
 import org.apache.pdfbox.Loader

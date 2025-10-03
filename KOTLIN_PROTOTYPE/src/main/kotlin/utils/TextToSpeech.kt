@@ -1,3 +1,5 @@
+package utils
+
 import kotlinx.coroutines.runBlocking
 // https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/run-blocking.html
 

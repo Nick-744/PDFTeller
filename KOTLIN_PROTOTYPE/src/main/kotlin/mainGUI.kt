@@ -13,6 +13,8 @@ import javafx.stage.FileChooser
 import javafx.stage.Modality
 import javafx.stage.Stage
 import kotlinx.coroutines.*
+import utils.TextToSpeechHelper
+import utils.processPdfTextWithStructure
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -408,10 +410,12 @@ class MainApp : Application()
                 saveLibraryMetadata()
             }
         }
-        catch (e: Exception) {
+        catch (e: Exception)
+        {
             Platform.runLater {
                 statusLabel.text = "Failed to save to library"
             }
+            println(e)
         }
     }
 
@@ -663,6 +667,7 @@ class MainApp : Application()
             Platform.runLater {
                 statusLabel.text = "Failed to load checkpoint"
             }
+            println(e)
         }
     }
 
@@ -687,6 +692,7 @@ class MainApp : Application()
             Platform.runLater {
                 statusLabel.text = "Failed to load book"
             }
+            println(e)
         }
     }
 
