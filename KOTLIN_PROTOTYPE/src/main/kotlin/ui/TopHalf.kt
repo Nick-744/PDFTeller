@@ -1,3 +1,5 @@
+package ui
+
 import javafx.application.Platform
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -5,6 +7,7 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.ToggleButton
 import javafx.scene.layout.HBox
+import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 
@@ -42,7 +45,7 @@ class TopHalf(
         val currentSentenceContainer = VBox(currentSentenceLabel).apply {
             alignment = Pos.CENTER
             padding   = Insets(20.0)
-            VBox.setVgrow(this, javafx.scene.layout.Priority.ALWAYS)
+            VBox.setVgrow(this, Priority.ALWAYS)
         }
 
         // Play/Stop/Checkpoint control buttons

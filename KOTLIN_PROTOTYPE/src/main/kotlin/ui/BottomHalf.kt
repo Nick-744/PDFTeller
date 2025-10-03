@@ -1,5 +1,8 @@
+package ui
+
 import javafx.application.Platform
 import javafx.collections.FXCollections
+import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -8,6 +11,7 @@ import javafx.scene.control.Label
 import javafx.scene.control.ListCell
 import javafx.scene.control.ListView
 import javafx.scene.layout.HBox
+import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 
@@ -26,7 +30,7 @@ class BottomHalf(
     {
         // Sentence history list
         sentenceListView = ListView(spokenSentences).apply {
-            VBox.setVgrow(this, javafx.scene.layout.Priority.ALWAYS)
+            VBox.setVgrow(this, Priority.ALWAYS)
 
             // Custom cell factory for text wrapping
             setCellFactory {
@@ -50,7 +54,7 @@ class BottomHalf(
         }
 
         // Auto-scroll to latest sentence
-        spokenSentences.addListener { _: javafx.collections.ListChangeListener.Change<out String> ->
+        spokenSentences.addListener { _: ListChangeListener.Change<out String> ->
             if (spokenSentences.isNotEmpty())
                 Platform.runLater {
                     sentenceListView.scrollTo(spokenSentences.size - 1)

@@ -5,6 +5,8 @@ import javafx.scene.layout.VBox
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import kotlinx.coroutines.*
+import ui.BottomHalf
+import ui.TopHalf
 import utils.TextToSpeechHelper
 import utils.processPdfTextWithStructure
 import java.io.File
@@ -12,10 +14,11 @@ import java.io.File
 class MainApp : Application()
 {
     private          val ttsHelper = TextToSpeechHelper()
-    private lateinit var topHalf:    TopHalf
+    private lateinit var topHalf: TopHalf
     private lateinit var bottomHalf: BottomHalf
 
     private val libraryManager = LibraryManager()
+    private val libraryUI      = LibraryUI(libraryManager)
 
     @Volatile
     private var isPlaying     = false
@@ -40,7 +43,7 @@ class MainApp : Application()
 
         // Initialize bottom half with callbacks
         bottomHalf = BottomHalf(
-            onLoadPDF     = { loadPDFFile(primaryStage) },
+            onLoadPDF = { loadPDFFile(primaryStage) },
             onShowLibrary = { showLibrary(primaryStage) }
         )
         bottomHalf.bindHeightToStage(primaryStage)
@@ -171,7 +174,7 @@ class MainApp : Application()
 
     private fun showLibrary(primaryStage: Stage)
     {
-        libraryManager.showLibrary(
+        libraryUI.showLibrary(
             primaryStage,
             onBookLoaded = { book, sentences ->
                 loadBookFromLibrary(book, sentences)
