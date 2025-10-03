@@ -39,17 +39,8 @@ data class Checkpoint
 class MainApp : Application()
 {
     private          val ttsHelper = TextToSpeechHelper()
-    private          val spokenSentences:      ObservableList<String> = FXCollections.observableArrayList()
-    private lateinit var sentenceListView:     ListView<String>
-    private lateinit var currentSentenceLabel: Label
-    private lateinit var statusLabel:          Label
-    private lateinit var playButton:           Button
-    private lateinit var stopButton:           Button
-    private lateinit var checkpointButton:     Button
-    private lateinit var dyslexiaToggle:       ToggleButton
-    private          var baseSentenceStyle:    String = ""
-    private lateinit var topHalf:              VBox
-    private          var baseTopHalfStyle:     String = ""
+    private lateinit var topHalf:    TopHalf
+    private lateinit var bottomHalf: BottomHalf
 
     // Library
     private val library:     ObservableList<Book>       = FXCollections.observableArrayList()
@@ -68,130 +59,34 @@ class MainApp : Application()
 
     init
     {
-        // Create library directory if it doesn't exist
         if (!libraryDir.exists())
-            libraryDir.mkdirs()
+            libraryDir.mkdirs() // Create library directory if it doesn't exist...
+
         loadLibrary()
         loadCheckpoints()
     }
 
     override fun start(primaryStage: Stage)
     {
-        // Current sentence display
-        currentSentenceLabel = Label("No sentence playing...").apply {
-            style             = "-fx-font-size: 24px; -fx-padding: 20px;"
-            baseSentenceStyle = style // Save the style so we can restore it!
+        // Initialize top half with callbacks
+        topHalf = TopHalf(
+            onPlay = { handlePlay() },
+            onStop = { handleStop() },
+            onSaveCheckpoint = { saveCheckpoint() },
+            onToggleDyslexia = { enabled -> toggleDyslexiaMode(enabled) }
+        )
+        topHalf.bindHeightToStage(primaryStage)
 
-            isWrapText = true
-            alignment  = Pos.CENTER
-            maxWidth   = Double.MAX_VALUE
-            maxHeight  = Double.MAX_VALUE
-        }
-
-        val currentSentenceContainer = VBox(currentSentenceLabel).apply {
-            alignment = Pos.CENTER
-            padding   = Insets(20.0)
-            VBox.setVgrow(this, javafx.scene.layout.Priority.ALWAYS)
-        }
-
-        // Play/Stop/Checkpoint control buttons
-        playButton = Button("▶ Play").apply {
-            prefWidth = 100.0
-            setOnAction { handlePlay() }
-        }
-
-        stopButton = Button("■ Stop").apply {
-            prefWidth = 100.0
-            isDisable = true
-            setOnAction { handleStop() }
-        }
-
-        checkpointButton = Button("🔖 Save Checkpoint").apply {
-            prefWidth = 150.0
-            isDisable = true
-            setOnAction { saveCheckpoint() }
-        }
-
-        // Dyslexia-friendly toggle
-        dyslexiaToggle = ToggleButton("Dyslexia-friendly").apply {
-            prefWidth = 160.0
-            isDisable = false
-            setOnAction {
-                toggleDyslexiaMode(isSelected)
-            }
-        }
-
-        val controlButtons = HBox(10.0, playButton, stopButton, checkpointButton, dyslexiaToggle).apply {
-            alignment = Pos.CENTER
-            padding   = Insets(10.0, 10.0, 20.0, 10.0)
-        }
-
-        // Top half: Current sentence + controls
-        topHalf = VBox().apply {
-            children.addAll(currentSentenceContainer, controlButtons)
-            prefHeightProperty().bind(primaryStage.heightProperty().divide(2))
-            style            = "-fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;"
-            baseTopHalfStyle = style // Save base style for restoring later...
-        }
-
-        // Sentence history list
-        sentenceListView = ListView(spokenSentences).apply {
-            VBox.setVgrow(this, javafx.scene.layout.Priority.ALWAYS)
-
-            // Custom cell factory for text wrapping
-            setCellFactory {
-                object : ListCell<String>()
-                {
-                    init
-                    {
-                        isWrapText = true
-                        prefWidthProperty().bind(this@apply.widthProperty().subtract(20))
-                        maxWidth = Double.MAX_VALUE
-                    }
-
-                    override fun updateItem(item: String?, empty: Boolean)
-                    {
-                        super.updateItem(item, empty)
-                        text    = if (empty || item == null) null else item
-                        graphic = null
-                    }
-                }
-            }
-        }
-
-        // Auto-scroll to latest sentence
-        spokenSentences.addListener { _: javafx.collections.ListChangeListener.Change<out String> ->
-            if (spokenSentences.isNotEmpty())
-                Platform.runLater {
-                    sentenceListView.scrollTo(spokenSentences.size - 1)
-                }
-        }
-
-        // Status and load controls at bottom
-        statusLabel = Label("Ready for your pdf!")
-
-        val loadButton = Button("Load PDF").apply {
-            setOnAction { loadPDFFile(primaryStage) }
-        }
-
-        val libraryButton = Button("📚 Library").apply {
-            setOnAction { showLibrary(primaryStage) }
-        }
-
-        val bottomBar = HBox(10.0, loadButton, libraryButton, statusLabel).apply {
-            alignment = Pos.CENTER
-            padding   = Insets(10.0)
-        }
-
-        // Bottom half: List + bottom bar
-        val bottomHalf = VBox().apply {
-            children.addAll(sentenceListView, bottomBar)
-            prefHeightProperty().bind(primaryStage.heightProperty().divide(2))
-        }
+        // Initialize bottom half with callbacks
+        bottomHalf = BottomHalf(
+            onLoadPDF     = { loadPDFFile(primaryStage) },
+            onShowLibrary = { showLibrary(primaryStage) }
+        )
+        bottomHalf.bindHeightToStage(primaryStage)
 
         // Main layout using VBox to stack the two halves
         val root = VBox().apply {
-            children.addAll(topHalf, bottomHalf)
+            children.addAll(topHalf.topHalfContainer, bottomHalf.bottomHalfContainer)
         }
 
         val scene = Scene(root, 1000.0, 740.0)
@@ -202,28 +97,14 @@ class MainApp : Application()
 
     private fun toggleDyslexiaMode(enabled: Boolean)
     {
-        Platform.runLater {
-            if (enabled)
-            {
-                if (this@MainApp::topHalf.isInitialized)
-                    topHalf.style = "$baseTopHalfStyle -fx-background-color: #1d0f0f;"
-                // Apply text color and font for the current sentence label
-                currentSentenceLabel.style = "$baseSentenceStyle -fx-text-fill: #a08060; -fx-font-family: 'OpenDyslexic3';"
-            }
-            else
-            { // Restore base styles
-                if (this@MainApp::topHalf.isInitialized)
-                    topHalf.style = baseTopHalfStyle
-                currentSentenceLabel.style = baseSentenceStyle
-            }
-        }
+        topHalf.toggleDyslexiaMode(enabled)
     }
 
     private fun handlePlay()
     {
         if (currentSentences.isEmpty())
         {
-            statusLabel.text = "No PDF loaded"
+            bottomHalf.updateStatus("No PDF loaded")
             return
         }
 
@@ -239,18 +120,15 @@ class MainApp : Application()
     {
         stopRequested = true
 
+        bottomHalf.updateStatus("Finishing current sentence...")
         Platform.runLater {
-            statusLabel.text     = "Finishing current sentence..."
-            stopButton.isDisable = true
+            topHalf.stopButton.isDisable = true
         }
     }
 
-    private fun updateButtonStates() {
-        Platform.runLater {
-            playButton.isDisable       = isPlaying || currentSentences.isEmpty()
-            stopButton.isDisable       = !isPlaying
-            checkpointButton.isDisable = currentSentences.isEmpty() || currentBookTitle == null
-        }
+    private fun updateButtonStates()
+    {
+        topHalf.updateButtonStates(isPlaying, currentSentences, currentBookTitle)
     }
 
     private fun saveCheckpoint()
@@ -272,24 +150,22 @@ class MainApp : Application()
         checkpoints.add(checkpoint)
         saveCheckpointsMetadata()
 
-        Platform.runLater {
-            statusLabel.text = "Checkpoint saved at sentence ${currentIndex + 1}"
-            showTemporaryMessage()
-        }
+        bottomHalf.updateStatus("Checkpoint saved at sentence ${currentIndex + 1}")
+        showTemporaryMessage()
     }
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun showTemporaryMessage()
     {
-        val originalText = statusLabel.text
+        val originalText = bottomHalf.statusLabel.text
         val message      = "✓ Checkpoint saved!"
-        statusLabel.text = message
-        GlobalScope.launch(Dispatchers.IO) {
+        bottomHalf.updateStatus(message)
+        GlobalScope.launch(Dispatchers.IO)
+        {
             delay(2000)
             Platform.runLater {
-                if (statusLabel.text == message) {
-                    statusLabel.text = originalText
-                }
+                if (bottomHalf.statusLabel.text == message)
+                    bottomHalf.updateStatus(originalText)
             }
         }
     }
@@ -306,7 +182,8 @@ class MainApp : Application()
                 if (line.contains("title:"))
                 {
                     val parts = line.split("|")
-                    if (parts.size >= 4) {
+                    if (parts.size >= 4)
+                    {
                         val checkpoint = Checkpoint(
                             bookTitle     = parts[0].substringAfter("title:"),
                             sentenceIndex = parts[1].substringAfter("index:").toInt(),
@@ -352,11 +229,9 @@ class MainApp : Application()
     @OptIn(DelicateCoroutinesApi::class)
     private fun processFile(file: File)
     {
-        Platform.runLater {
-            statusLabel.text          = "Processing PDF..."
-            spokenSentences.clear()
-            currentSentenceLabel.text = "Loading..."
-        }
+        bottomHalf.updateStatus("Processing PDF...")
+        bottomHalf.clearSentences()
+        topHalf.updateCurrentSentence("Loading...")
 
         GlobalScope.launch(Dispatchers.IO) {
             val sentences = processPdfTextWithStructure(file)
@@ -368,11 +243,9 @@ class MainApp : Application()
             currentBookTitle = bookTitle
             saveBookToLibrary(bookTitle, sentences, file.name)
 
-            Platform.runLater {
-                statusLabel.text          = "PDF loaded (${sentences.size} sentences)"
-                currentSentenceLabel.text = "Ready to play"
-                updateButtonStates()
-            }
+            bottomHalf.updateStatus("PDF loaded (${sentences.size} sentences)")
+            topHalf.updateCurrentSentence("Ready to play")
+            updateButtonStates()
         }
     }
 
@@ -412,9 +285,7 @@ class MainApp : Application()
         }
         catch (e: Exception)
         {
-            Platform.runLater {
-                statusLabel.text = "Failed to save to library"
-            }
+            bottomHalf.updateStatus("Failed to save to library")
             println(e)
         }
     }
@@ -649,24 +520,22 @@ class MainApp : Application()
             currentIndex     = checkpoint.sentenceIndex
             currentBookTitle = checkpoint.bookTitle
 
-            Platform.runLater {
-                spokenSentences.clear()
-                // Add previous sentences to history
-                for (i in 0 until checkpoint.sentenceIndex) {
-                    if (i < sentences.size) {
-                        spokenSentences.add(sentences[i])
-                    }
-                }
-                statusLabel.text          = "Loaded checkpoint: ${checkpoint.bookTitle} at sentence ${checkpoint.sentenceIndex + 1}"
-                currentSentenceLabel.text = "Ready to resume from checkpoint"
-                updateButtonStates()
-            }
+            bottomHalf.clearSentences()
+
+            // Add previous sentences to history
+            val previousSentences = mutableListOf<String>()
+            for (i in 0 until checkpoint.sentenceIndex)
+                if (i < sentences.size)
+                    previousSentences.add(sentences[i])
+
+            bottomHalf.addSentences(previousSentences)
+            bottomHalf.updateStatus("Loaded checkpoint: ${checkpoint.bookTitle} at sentence ${checkpoint.sentenceIndex + 1}")
+            topHalf.updateCurrentSentence("Ready to resume from checkpoint")
+            updateButtonStates()
         }
         catch (e: Exception)
         {
-            Platform.runLater {
-                statusLabel.text = "Failed to load checkpoint"
-            }
+            bottomHalf.updateStatus("Failed to load checkpoint")
             println(e)
         }
     }
@@ -680,18 +549,14 @@ class MainApp : Application()
             currentIndex     = 0
             currentBookTitle = book.title
 
-            Platform.runLater {
-                spokenSentences.clear()
-                statusLabel.text          = "Loaded: ${book.title} (${sentences.size} sentences)"
-                currentSentenceLabel.text = "Ready to play"
-                updateButtonStates()
-            }
+            bottomHalf.clearSentences()
+            bottomHalf.updateStatus("Loaded: ${book.title} (${sentences.size} sentences)")
+            topHalf.updateCurrentSentence("Ready to play")
+            updateButtonStates()
         }
         catch (e: Exception)
         {
-            Platform.runLater {
-                statusLabel.text = "Failed to load book"
-            }
+            bottomHalf.updateStatus("Failed to load book")
             println(e)
         }
     }
@@ -722,18 +587,14 @@ class MainApp : Application()
     private fun speakSentences()
     {
         GlobalScope.launch(Dispatchers.IO) {
-            Platform.runLater {
-                statusLabel.text = "Playing..."
-            }
+            bottomHalf.updateStatus("Playing...")
 
             while (currentIndex < currentSentences.size && isPlaying)
             {
                 val sentence = currentSentences[currentIndex]
 
-                Platform.runLater {
-                    currentSentenceLabel.text = sentence
-                    spokenSentences.add(sentence)
-                }
+                topHalf.updateCurrentSentence(sentence)
+                bottomHalf.addSentence(sentence)
 
                 // Speak the sentence (blocking call)
                 ttsHelper.speak(sentence)
@@ -741,15 +602,13 @@ class MainApp : Application()
                 // After sentence completes, check if stop was requested
                 if (stopRequested)
                 {
-                    Platform.runLater {
-                        currentSentenceLabel.text = "Stopped"
-                        statusLabel.text = "Stopped"
-                        isPlaying        = false
-                        isStopped        = true
-                        stopRequested    = false
-                        currentIndex++ // Move to next sentence for resume
-                        updateButtonStates()
-                    }
+                    topHalf.updateCurrentSentence("Stopped")
+                    bottomHalf.updateStatus("Stopped")
+                    isPlaying     = false
+                    isStopped     = true
+                    stopRequested = false
+                    currentIndex++ // Move to next sentence for resume
+                    updateButtonStates()
                     return@launch
                 }
 
@@ -761,15 +620,15 @@ class MainApp : Application()
 
             // Check if we finished all sentences
             if (currentIndex >= currentSentences.size)
-                Platform.runLater {
-                    currentSentenceLabel.text = "Completed"
-                    statusLabel.text = "Finished"
-                    currentIndex     = 0  // Reset for replay
-                    isPlaying        = false
-                    isStopped        = true
-                    stopRequested    = false
-                    updateButtonStates()
-                }
+            {
+                topHalf.updateCurrentSentence("Completed")
+                bottomHalf.updateStatus("Finished")
+                currentIndex  = 0  // Reset for replay
+                isPlaying     = false
+                isStopped     = true
+                stopRequested = false
+                updateButtonStates()
+            }
         }
     }
 }
