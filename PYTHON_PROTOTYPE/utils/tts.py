@@ -1,4 +1,8 @@
-from process_pdf import process_pdf_text_with_structure
+try:
+    from utils.process_pdf import process_pdf_text_with_structure
+except ImportError:
+    from process_pdf import process_pdf_text_with_structure
+
 from pathlib import Path
 from time import sleep
 import pyttsx3
@@ -13,7 +17,7 @@ def speak_text(text: str) -> None:
     return;
 
 def main():
-    base_path = Path(__file__).parent.parent # Go up 1 directory!
+    base_path = Path(__file__).parent.parent.parent # Go up 2 directories!
     text      = process_pdf_text_with_structure(
         base_path / 'DATA' / 'Understanding_Climate_Change.pdf'
     )

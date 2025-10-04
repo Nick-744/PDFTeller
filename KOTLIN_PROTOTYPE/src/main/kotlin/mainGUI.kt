@@ -14,7 +14,7 @@ import java.io.File
 class MainApp : Application()
 {
     private          val ttsHelper = TextToSpeechHelper()
-    private lateinit var topHalf: TopHalf
+    private lateinit var topHalf:    TopHalf
     private lateinit var bottomHalf: BottomHalf
 
     private val libraryManager = LibraryManager()
