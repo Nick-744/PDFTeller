@@ -1,3 +1,4 @@
+/* Container */
 .drag-drop-container {
   display: flex;
   justify-content: center;
@@ -6,27 +7,26 @@
   padding: 20px;
 }
 
+/* Dropzone */
 .dropzone {
   border: 2px dashed #ccc;
   border-radius: 8px;
   padding: 60px 40px;
   text-align: center;
-  background-color: #fafafa;
-  transition: all 0.2s ease;
+  background: #fafafa;
   cursor: pointer;
   width: 400px;
   max-width: 90vw;
 }
 
-.dropzone:hover {
-  border-color: #666;
-  background-color: #f0f0f0;
-}
-
+.dropzone:hover,
 .dropzone.drag-active {
   border-color: #007acc;
-  background-color: #f0f8ff;
-  border-style: solid;
+  background: #f0f8ff;
+}
+
+.dropzone.uploading {
+  pointer-events: none;
 }
 
 .dropzone-content {
@@ -40,61 +40,46 @@
   width: 40px;
   height: 40px;
   color: #666;
-  transition: color 0.2s ease;
 }
 
-.dropzone:hover .upload-icon {
-  color: #333;
-}
-
+.dropzone:hover .upload-icon,
 .dropzone.drag-active .upload-icon {
   color: #007acc;
 }
 
 .dropzone-content h3 {
   margin: 0;
-  font-size: 1.1rem;
-  font-weight: 500;
   color: #333;
 }
 
 .dropzone-content p {
   margin: 0;
-  font-size: 0.9rem;
   color: #666;
 }
 
 .file-types {
   font-size: 0.8rem;
   color: #888;
-  background-color: #eee;
+  background: #eee;
   padding: 3px 8px;
   border-radius: 12px;
-  font-weight: 400;
 }
 
-/* Loading state */
-.dropzone.uploading {
-  pointer-events: none;
-  border-color: #007acc;
-  background-color: #f0f8ff;
-}
-
+/* Loading */
 .loading-spinner {
   width: 40px;
   height: 40px;
   border: 3px solid #eee;
-  border-top: 3px solid #007acc;
+  border-top-color: #007acc;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 
-/* Results container */
+/* Results */
 .result-container {
   width: 600px;
   max-width: 90vw;
@@ -102,26 +87,24 @@
   overflow-y: auto;
   padding: 30px;
   border-radius: 8px;
-  text-align: left;
+  border: 2px solid;
 }
 
 .result-container.success {
-  background-color: #f0f8ff;
-  border: 2px solid #007acc;
+  background: #f0f8ff;
+  border-color: #007acc;
 }
 
 .result-container.error {
-  background-color: #fff0f0;
-  border: 2px solid #dc3545;
+  background: #fff0f0;
+  border-color: #dc3545;
   text-align: center;
 }
 
 .result-container h3 {
-  margin: 0 0 20px 0;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #333;
+  margin: 0 0 20px;
   text-align: center;
+  color: #333;
 }
 
 .results-content {
@@ -131,7 +114,7 @@
 .result-section {
   margin-bottom: 15px;
   padding: 15px;
-  background-color: white;
+  background: white;
   border-radius: 5px;
   border-left: 4px solid #007acc;
 }
@@ -140,35 +123,32 @@
   margin: 0;
   line-height: 1.5;
   color: #333;
-  font-size: 0.95rem;
 }
 
 .retry-button {
-  background-color: #007acc;
+  background: #007acc;
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.2s ease;
   display: block;
   margin: 0 auto;
 }
 
 .retry-button:hover {
-  background-color: #005fa3;
+  background: #005fa3;
 }
 
 .result-container.error .retry-button {
-  background-color: #dc3545;
+  background: #dc3545;
 }
 
 .result-container.error .retry-button:hover {
-  background-color: #c82333;
+  background: #c82333;
 }
 
-/* Responsive design */
+/* Mobile */
 @media (max-width: 480px) {
   .dropzone {
     padding: 40px 20px;
@@ -179,25 +159,9 @@
     width: 35px;
     height: 35px;
   }
-  
-  .dropzone-content h3 {
-    font-size: 1rem;
-  }
-  
-  .dropzone-content p {
-    font-size: 0.85rem;
-  }
 
   .result-container {
     width: 300px;
     padding: 20px;
-  }
-
-  .result-container h3 {
-    font-size: 1.1rem;
-  }
-
-  .result-section p {
-    font-size: 0.9rem;
   }
 }
