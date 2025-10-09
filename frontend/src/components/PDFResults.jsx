@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import TTSComponent from './TTSComponent'
 import './PDFResults.css'
 
-const PDFResults = ({ results, reset }) => {
+const PDFResults = ({ results, reset, showLibrary }) => {
   const [sentences,       setSentences      ] = useState([])
   const [currentIndex,    setCurrentIndex   ] = useState(0)
   const [spokenSentences, setSpokenSentences] = useState([])
@@ -67,9 +67,11 @@ const PDFResults = ({ results, reset }) => {
 
           <div className = "results-header">
             <h2>PDFTeller</h2>
-            <button onClick = {reset} className = "upload-another-btn">
-              Upload Another PDF
-            </button>
+            <div className = "header-buttons">
+              <button onClick = {showLibrary} className = "library-btn">
+                Library
+              </button>
+            </div>
           </div>
         </div>
 

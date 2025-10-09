@@ -2,8 +2,8 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from process_pdf import process_pdf_text_with_structure
-from pdf_library_manager import PDFLibraryManager
+from utils.process_pdf import process_pdf_text_with_structure
+from utils.pdf_library_manager import PDFLibraryManager
 
 from typing import List, Dict
 
@@ -24,14 +24,31 @@ app.add_middleware(
     allow_headers     = ['*']
 )
 
-@app.post('/api/process_pdf', response_model = List[str])
+@app.post('/api/process_pdf', response_model = Dict)
 async def process_pdf(pdf_file: UploadFile = File(...)):
+    # Check if PDF already exists in library
+    if pdf_library.pdf_exists(pdf_file.filename):
+        # Return existing PDF data instead of reprocessing
+        existing_pdfs = pdf_library.get_all_pdfs()
+        existing_pdf  = next((pdf for pdf in existing_pdfs if pdf['filename'] == pdf_file.filename), None)
+        if existing_pdf:
+            existing_pdf_data = pdf_library.get_pdf_by_id(existing_pdf['id'])
+
+            return {
+                'sentences':    existing_pdf_data['sentences'],
+                'from_library': True
+            };
+    
+    # Process new PDF
     pdf_data       = await pdf_file.read()
     processed_text = process_pdf_text_with_structure(pdf_data)
     
     pdf_library.add_pdf(pdf_file.filename, processed_text)
 
-    return processed_text;
+    return {
+        'sentences':    processed_text,
+        'from_library': False
+    };
 
 # --- PDF Library Endpoints --- #
 

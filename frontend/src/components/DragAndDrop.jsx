@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import api from '../api'
 import './DragAndDrop.css'
@@ -10,24 +11,51 @@ const MyDragAndDrop = ({
   setResults, 
   error, 
   setError, 
-  reset 
+  reset,
+  showLibrary 
 }) => {
+  const [loadingMessage, setLoadingMessage] = useState('Processing PDF...')
+  const [loadingSubtext, setLoadingSubtext] = useState(
+    'Please wait while we extract the content'
+  )
+
   const handleFileUpload = async (file) => {
     setIsUploading(true)
     setError(null)
     setResults(null)
+    setLoadingMessage('Processing PDF...')
+    setLoadingSubtext('Please wait while we extract the content')
 
-    try {
+    try
+    {
       const formData = new FormData()
       formData.append('pdf_file', file)
-      const response = await api.post('/api/process_pdf', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-      setResults(response.data)
-    } catch (err) {
+      
+      // Start the request
+      const response = await api.post(
+        '/api/process_pdf',
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      )
+      
+      // Update message based on response!
+      if (response.data.from_library)
+      {
+        setLoadingMessage('Loading from library...')
+        setLoadingSubtext('Found in library, loading existing content')
+        // Give user a moment to see the library message
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
+      
+      setResults(response.data.sentences)
+    }
+    catch (err)
+    {
       console.error('Error uploading file:', err)
       setError('Failed to process PDF. Please try again.')
-    } finally {
+    }
+    finally
+    {
       setIsUploading(false)
     }
   }
@@ -40,14 +68,19 @@ const MyDragAndDrop = ({
   })
 
   const renderUploadArea = () => (
-    <div {...getRootProps()} className = {`dropzone ${isDragActive ? 'drag-active' : ''} ${isUploading ? 'uploading' : ''}`}>
+    <div
+    {...getRootProps()}
+    className = {
+      `dropzone ${isDragActive ? 'drag-active' : ''} ${isUploading ? 'uploading' : ''}`
+    }
+    >
       <input {...getInputProps()} />
       <div className = "dropzone-content">
         {isUploading ? (
           <>
             <div className = "loading-spinner"></div>
-            <h3>Processing PDF...</h3>
-            <p>Please wait while we extract the content</p>
+            <h3>{loadingMessage}</h3>
+            <p>{loadingSubtext}</p>
           </>
         ) : (
           <>
@@ -71,8 +104,16 @@ const MyDragAndDrop = ({
 
   return (
     <div className = "drag-drop-container">
-      {error && renderError()}
-      {!results && !error && renderUploadArea()}
+      <div className = "app-header">
+        <h1>PDFTeller</h1>
+        <button onClick = {showLibrary} className = "library-btn">
+          View Library
+        </button>
+      </div>
+      <div className = "dropzone-wrapper">
+        {error && renderError()}
+        {!results && !error && renderUploadArea()}
+      </div>
     </div>
   );
 }

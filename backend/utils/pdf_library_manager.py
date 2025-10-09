@@ -26,17 +26,44 @@ class PDFLibraryManager:
         
         return;
     
+    def pdf_exists(self, filename: str) -> bool:
+        '''
+        Check if a PDF with the given filename already exists in the library
+        
+        Args:
+            filename: Name of the PDF file to check
+            
+        Returns:
+            bool: True if PDF exists, False otherwise
+        '''
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT COUNT(*) FROM pdf_library WHERE filename = ?', (filename,))
+            count  = cursor.fetchone()[0]
+
+            return count > 0;
+    
     def add_pdf(self, filename: str, sentences: List[str]) -> int:
         '''
-        Add a new PDF record to the library
+        Add a new PDF record to the library (only if it doesn't already exist)
         
         Args:
             filename:  Name of the PDF file
             sentences: List of processed sentences from the PDF
             
         Returns:
-            int: ID of the newly created record
+            int: ID of the newly created record, or existing record ID if already exists
         '''
+        # Check if PDF already exists
+        if self.pdf_exists(filename):
+            # Return the existing PDF's ID
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('SELECT id FROM pdf_library WHERE filename = ?', (filename,))
+
+                return cursor.fetchone()[0];
+        
+        # Add new PDF if it doesn't exist
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             

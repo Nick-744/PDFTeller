@@ -4,7 +4,6 @@
   border-radius: 12px;
   color: white;
   margin-bottom: 20px;
-  box-shadow: 0 4px 15px rgba(255, 159, 67, 0.4);
   font-family: 'OpenDyslexic3', sans-serif;
 }
 
@@ -32,7 +31,6 @@
 .tts-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .tts-btn:disabled {
@@ -102,7 +100,6 @@
   border-radius: 50%;
   background: white;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease;
 }
 
@@ -117,7 +114,6 @@
   background: white;
   cursor: pointer;
   border: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .tts-status {

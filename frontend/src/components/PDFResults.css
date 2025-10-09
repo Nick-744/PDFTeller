@@ -1,7 +1,6 @@
 .pdf-results-container {
   padding: 20px;
   background: linear-gradient(135deg, #2d1b69 0%, #11998e 100%);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   animation: fadeIn 0.5s ease-in;
   height: 100vh;
   overflow: hidden;
@@ -32,12 +31,17 @@
   width: calc(100% - 80px);
 }
 
+.header-buttons {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
 .results-header h2 {
   margin: 0;
   color: #ffffff;
   font-size: 1.8rem;
   font-weight: 700;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .upload-another-btn {
@@ -50,12 +54,26 @@
   font-size: 14px;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
 }
 
 .upload-another-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+}
+
+.library-btn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #ff9f43 0%, #ff6348 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.library-btn:hover {
+  transform: translateY(-2px);
 }
 
 .two-column-layout {
@@ -155,7 +173,6 @@
   border-radius: 12px;
   padding: 20px;
   border: 2px solid #ff9f43;
-  box-shadow: 0 4px 20px rgba(255, 159, 67, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -192,7 +209,6 @@
   font-weight: bold;
   font-size: 14px;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(255, 159, 67, 0.4);
 }
 
 .current-sentence p {
