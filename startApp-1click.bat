@@ -7,7 +7,7 @@ start "" /b python main.py
 cd ..
 
 cd frontend
-start "" /b npm run dev
+start "" /b npm run dev -- --host
 cd ..
 
 :loop
