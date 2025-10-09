@@ -132,7 +132,7 @@ const TTSComponent = ({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default TTSComponent;
