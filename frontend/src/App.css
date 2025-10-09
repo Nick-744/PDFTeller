@@ -1,0 +1,22 @@
+/* Import OpenDyslexic3 font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=OpenDyslexic3&display=swap');
+
+/* Global font application */
+* {
+  font-family: 'OpenDyslexic3', sans-serif !important;
+}
+
+/* Root level font family */
+:root {
+  font-family: 'OpenDyslexic3', sans-serif;
+}
+
+/* Body font family */
+body {
+  font-family: 'OpenDyslexic3', sans-serif;
+}
+
+/* Additional fallback for input elements */
+input, select, textarea, button {
+  font-family: 'OpenDyslexic3', sans-serif !important;
+}
