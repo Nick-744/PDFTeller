@@ -19,7 +19,8 @@ class PDFLibraryManager:
                     filename       TEXT NOT NULL,
                     sentences      TEXT NOT NULL,
                     date_added     TIMESTAMP NOT NULL,
-                    sentence_count INTEGER NOT NULL
+                    sentence_count INTEGER NOT NULL,
+                    bookmark       INTEGER NULL
                 )
             ''')
             conn.commit()
@@ -91,7 +92,7 @@ class PDFLibraryManager:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                SELECT   id, filename, date_added, sentence_count
+                SELECT   id, filename, date_added, sentence_count, bookmark
                 FROM     pdf_library
                 ORDER BY date_added DESC
             ''')
@@ -104,7 +105,8 @@ class PDFLibraryManager:
                     'id':             row[0],
                     'filename':       row[1],
                     'date_added':     row[2],
-                    'sentence_count': row[3]
+                    'sentence_count': row[3],
+                    'bookmark':       row[4]
                 })
             
             return pdfs;
@@ -122,7 +124,7 @@ class PDFLibraryManager:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                SELECT id, filename, sentences, date_added, sentence_count
+                SELECT id, filename, sentences, date_added, sentence_count, bookmark
                 FROM   pdf_library
                 WHERE  id = ?
             ''', (pdf_id,))
@@ -138,7 +140,8 @@ class PDFLibraryManager:
                     'filename':       row[1],
                     'sentences':      sentences,
                     'date_added':     row[3],
-                    'sentence_count': row[4]
+                    'sentence_count': row[4],
+                    'bookmark':       row[5]
                 };
             
             return None;
@@ -156,6 +159,28 @@ class PDFLibraryManager:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('DELETE FROM pdf_library WHERE id = ?', (pdf_id,))
+            conn.commit()
+            
+            return cursor.rowcount > 0;
+    
+    def add_bookmark(self, pdf_id: int, sentence_index: int) -> bool:
+        '''
+        Add or update a bookmark for a specific PDF
+        
+        Args:
+            pdf_id: ID of the PDF record
+            sentence_index: Index of the sentence to bookmark (0-based)
+            
+        Returns:
+            bool: True if bookmark was successfully added/updated, False otherwise
+        '''
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                UPDATE pdf_library 
+                SET    bookmark = ? 
+                WHERE  id = ?
+            ''', (sentence_index, pdf_id))
             conn.commit()
             
             return cursor.rowcount > 0;

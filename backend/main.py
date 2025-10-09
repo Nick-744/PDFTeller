@@ -72,5 +72,22 @@ async def delete_pdf(pdf_id: int):
     
     return {'message': 'PDF deleted successfully'};
 
+@app.put('/api/library/{pdf_id}/bookmark')
+async def add_bookmark(pdf_id: int, sentence_index: int):
+    # Verify PDF exists
+    pdf_record = pdf_library.get_pdf_by_id(pdf_id)
+    if not pdf_record:
+        raise HTTPException(status_code = 404, detail = 'PDF not found');
+    
+    # Verify sentence index is valid
+    if sentence_index < 0 or sentence_index >= pdf_record['sentence_count']:
+        raise HTTPException(status_code = 400, detail = 'Invalid sentence index');
+    
+    success = pdf_library.add_bookmark(pdf_id, sentence_index)
+    if not success:
+        raise HTTPException(status_code = 500, detail = 'Failed to add bookmark');
+    
+    return {'message': 'Bookmark added successfully'};
+
 if __name__ == '__main__':
     uvicorn.run(app, host = '0.0.0.0', port = 8000)
