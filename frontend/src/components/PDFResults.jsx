@@ -1,19 +1,24 @@
 import { useState, useEffect } from 'react'
 import TTSComponent from './TTSComponent'
+import { addBookmark } from '../api'
 import './PDFResults.css'
 
-const PDFResults = ({ results, reset, showLibrary }) => {
+const PDFResults = ({ results, reset, showLibrary, currentPdfId, startFromIndex = 0 }) => {
   const [sentences,       setSentences      ] = useState([])
   const [currentIndex,    setCurrentIndex   ] = useState(0)
   const [spokenSentences, setSpokenSentences] = useState([])
   const [isPlaying,       setIsPlaying      ] = useState(false)
+  const [bookmarkLoading, setBookmarkLoading] = useState(false)
 
   // Use results directly as returned by backend...
   useEffect(() => {
     setSentences(results)
-    setCurrentIndex(0)
-    setSpokenSentences([])
-  }, [results])
+    setCurrentIndex(startFromIndex)
+    
+    // Build spoken sentences list if starting from bookmark
+    const spokenFromBookmark = startFromIndex > 0 ? results.slice(0, startFromIndex).reverse() : []
+    setSpokenSentences(spokenFromBookmark)
+  }, [results, startFromIndex])
 
   // Handle when a sentence is completed by TTS
   const handleSentenceComplete = () => {
@@ -33,6 +38,26 @@ const PDFResults = ({ results, reset, showLibrary }) => {
 
   const getCurrentSentence = () => {
     return sentences[currentIndex] || "";
+  }
+
+  const handleBookmark = async () => {
+    if (!currentPdfId || currentIndex >= sentences.length) return;
+    
+    setBookmarkLoading(true)
+    try
+    {
+      await addBookmark(currentPdfId, currentIndex)
+      alert(`Bookmark saved at sentence ${currentIndex + 1}!`)
+    }
+    catch (error)
+    {
+      console.error('Failed to save bookmark:', error)
+      alert('Failed to save bookmark. Please try again.')
+    }
+    finally
+    {
+      setBookmarkLoading(false)
+    }
   }
 
   return (
@@ -68,6 +93,16 @@ const PDFResults = ({ results, reset, showLibrary }) => {
           <div className = "results-header">
             <h2>PDFTeller</h2>
             <div className = "header-buttons">
+              {currentPdfId && currentIndex < sentences.length && (
+                <button 
+                  onClick   = {handleBookmark}
+                  disabled  = {bookmarkLoading}
+                  className = "bookmark-btn"
+                  title     = {`Bookmark current sentence (${currentIndex + 1})`}
+                >
+                  {bookmarkLoading ? 'Saving...' : 'Bookmark'}
+                </button>
+              )}
               <button onClick = {showLibrary} className = "library-btn">
                 Library
               </button>

@@ -6,9 +6,11 @@ import './App.css'
 
 function App()
 {
-  const [isUploading, setIsUploading] = useState(false)
-  const [results,     setResults    ] = useState(null)
-  const [error,       setError      ] = useState(null)
+  const [isUploading,    setIsUploading   ] = useState(false)
+  const [results,        setResults       ] = useState(null)
+  const [error,          setError         ] = useState(null)
+  const [currentPdfId,   setCurrentPdfId  ] = useState(null)
+  const [startFromIndex, setStartFromIndex] = useState(0)
 
   // 'upload', 'results', 'library'
   const [currentView,     setCurrentView    ] = useState('upload')
@@ -39,6 +41,8 @@ function App()
   const reset = () => {
     setResults(null)
     setError(null)
+    setCurrentPdfId(null)
+    setStartFromIndex(0)
     transitionToView('upload')
   }
 
@@ -47,11 +51,16 @@ function App()
   const showUpload = () => {
     setResults(null)
     setError(null)
+    setCurrentPdfId(null)
+    setStartFromIndex(0)
     transitionToView('upload')
   }
 
-  const handlePDFSelect = (sentences) => {
-    setResults(sentences)
+  const handlePDFSelect = (pdfData) => {
+    // Handle PDF data object with pdfId and startFromIndex
+    setResults(pdfData.sentences)
+    setCurrentPdfId(pdfData.pdfId)
+    setStartFromIndex(pdfData.startFromIndex || 0)
     transitionToView('results')
   }
 
@@ -87,9 +96,11 @@ function App()
         key = "results"
         >
           <PDFResults 
-          results     = {results} 
-          reset       = {reset}
-          showLibrary = {showLibrary}
+          results        = {results} 
+          reset          = {reset}
+          showLibrary    = {showLibrary}
+          currentPdfId   = {currentPdfId}
+          startFromIndex = {startFromIndex}
           />
         </div>
       )}

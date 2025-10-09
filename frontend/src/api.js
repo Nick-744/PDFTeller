@@ -5,5 +5,10 @@ const api = axios.create({
     baseURL: 'http://localhost:8000',
 })
 
+// Bookmark function
+export const addBookmark = async (pdfId, sentenceIndex) => {
+    return await api.put(`/api/library/${pdfId}/bookmark?sentence_index=${sentenceIndex}`);
+}
+
 // Export the Axios instance
 export default api;

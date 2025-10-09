@@ -432,11 +432,12 @@
 
 .pdf-card-actions {
   display: flex;
+  gap: 30px;
   justify-content: center;
 }
 
 .load-pdf-btn {
-  width: 100%;
+  flex: 1;
   padding: 15px 20px;
   background: linear-gradient(135deg, #ff9f43 0%, #ff6348 100%);
   color: white;
@@ -559,4 +560,46 @@
   .delete-btn {
     align-self: flex-end;
   }
+}
+
+/* Bookmark-specific styles */
+
+.resume-bookmark-btn {
+  flex: 0 0 auto;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.resume-bookmark-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.resume-bookmark-btn:hover::before {
+  left: 100%;
+}
+
+.resume-bookmark-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+}
+
+.resume-bookmark-btn:active {
+  transform: translateY(-1px) scale(1.02);
 }

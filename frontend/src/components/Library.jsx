@@ -43,11 +43,16 @@ const Library = ({ onSelectPDF, onBackToUpload }) => {
     }
   }
 
-  const handleSelectPDF = async (pdfId) => {
+  const handleSelectPDF = async (pdfId, startFromBookmark = null) => {
     try
     {
       const response = await api.get(`/api/library/${pdfId}`)
-      onSelectPDF(response.data.sentences)
+      const pdfData = {
+        sentences: response.data.sentences,
+        pdfId: pdfId,
+        startFromIndex: startFromBookmark !== null ? startFromBookmark : 0
+      }
+      onSelectPDF(pdfData)
     }
     catch (err)
     {
@@ -193,6 +198,12 @@ const Library = ({ onSelectPDF, onBackToUpload }) => {
                         <span className = "stat-label">📅 Added:</span>
                         <span className = "stat-value">{formatDate(pdf.date_added)}</span>
                       </div>
+                      {pdf.bookmark !== null && (
+                        <div className = "pdf-stat bookmark-stat">
+                          <span className = "stat-label">🔖 Bookmark:</span>
+                          <span className = "stat-value">Sentence {pdf.bookmark + 1}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className = "pdf-card-actions">
@@ -202,6 +213,15 @@ const Library = ({ onSelectPDF, onBackToUpload }) => {
                       >
                         Load & Read
                       </button>
+                      {pdf.bookmark !== null && (
+                        <button 
+                        onClick   = {() => handleSelectPDF(pdf.id, pdf.bookmark)}
+                        className = "resume-bookmark-btn"
+                        title     = {`Resume from sentence ${pdf.bookmark + 1}`}
+                        >
+                          Resume
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
