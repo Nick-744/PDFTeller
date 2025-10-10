@@ -179,6 +179,9 @@
   .tts-buttons {
     justify-content: center;
     width: 100%;
+    margin: 0;
+    align-items: center;
+    display: flex;
   }
   
   .tts-btn {
@@ -189,7 +192,10 @@
   
   .tts-settings-toggle {
     display: inline-block;
-    width: 100%;
+    width: auto;
+    margin-bottom: 10px;
+    margin-right: 8px;
+    padding: 8px 12px;
   }
 
   .tts-settings {

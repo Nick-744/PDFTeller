@@ -80,6 +80,17 @@ const TTSComponent = ({
   return (
     <div className = "tts-controls">
       <div className = "tts-buttons">
+        {/* Mobile-only toggle for expanded settings - placed left of play */}
+        <button
+        type          = "button"
+        className     = "tts-settings-toggle"
+        onClick       = {() => setShowSettings(s => !s)}
+        aria-expanded = {showSettings}
+        aria-controls = "tts-settings-panel"
+        >
+          {showSettings ? 'Hide settings' : 'Show settings'}
+        </button>
+
         <button 
         onClick   = {isPlaying ? handleStop : handlePlay} 
         className = {`tts-btn ${isPlaying ? 'stop-btn' : 'play-btn'}`}
@@ -88,17 +99,6 @@ const TTSComponent = ({
           {isPlaying ? 'Stop' : 'Play'}
         </button>
       </div>
-
-      {/* Mobile-only toggle for expanded settings */}
-      <button
-      type          = "button"
-      className     = "tts-settings-toggle"
-      onClick       = {() => setShowSettings(s => !s)}
-      aria-expanded = {showSettings}
-      aria-controls = "tts-settings-panel"
-      >
-        {showSettings ? 'Hide settings' : 'Show settings'}
-      </button>
 
       <div id = "tts-settings-panel" className = {`tts-settings ${showSettings ? 'open' : ''}`}>
         <div className = "setting-group">

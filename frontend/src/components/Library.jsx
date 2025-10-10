@@ -103,8 +103,8 @@ const Library = ({ onSelectPDF, onBackToUpload }) => {
     <div className = "library-container">
       <div className = "two-column-layout">
         {/* Left Column - Controls and Navigation */}
-        <div className = "left-column">
-          <div className = "left-column-top">
+        <div className = "left-col-library">
+          <div className = "left-col-top-library">
             <div className = "library-header">
               <div className = "library-title">
                 <h1>Library</h1>
@@ -133,7 +133,7 @@ const Library = ({ onSelectPDF, onBackToUpload }) => {
               </div>
               <div className = "library-stats">
                 <span className = "stat">
-                  📁 Total: {libraryData.length} PDFs
+                  📁 Total: {libraryData.length}
                 </span>
                 <span className = "stat">
                   👁️ Showing: {filteredData.length}

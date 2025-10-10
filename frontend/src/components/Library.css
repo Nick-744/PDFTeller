@@ -49,7 +49,7 @@
   overflow: hidden;
 }
 
-.left-column {
+.left-col-library {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -57,7 +57,7 @@
   overflow: hidden;
 }
 
-.left-column-top {
+.left-col-top-library {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -527,13 +527,13 @@
     overflow: visible;
   }
   
-  .left-column {
+  .left-col-library, .left-column {
     order: 1;
     height: auto;
     overflow: visible;
   }
   
-  .left-column-top {
+  .left-col-top-library, .left-column-top {
     overflow: visible;
     flex: 0 0 auto;
     min-height: fit-content;
