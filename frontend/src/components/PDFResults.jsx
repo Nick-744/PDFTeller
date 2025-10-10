@@ -76,7 +76,7 @@ const PDFResults = ({ results, reset, showLibrary, currentPdfId, startFromIndex 
 
             <div className = "reading-stats">
               <div className = "stat">
-                <span className = "stat-label">Total Sentences:</span>
+                <span className = "stat-label">Total:</span>
                 <span className = "stat-value">{sentences.length}</span>
               </div>
               <div className = "stat">
@@ -111,7 +111,7 @@ const PDFResults = ({ results, reset, showLibrary, currentPdfId, startFromIndex 
         </div>
 
         {/* Right Column - Sentence Stack */}
-        <div className = "right-column">
+        <div className = "right-col-pdf_results">
           <div className = "sentence-stack">
             {/* Current sentence */}
             {sentences.length > 0 && currentIndex < sentences.length && (

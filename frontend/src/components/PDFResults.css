@@ -101,7 +101,7 @@
   overflow: auto;
 }
 
-.right-column {
+.right-col-pdf_results {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -273,10 +273,11 @@
   display: flex;
   justify-content: space-around;
   gap: 15px;
-  padding: 20px;
+  padding: 10px;
   background: rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   backdrop-filter: blur(10px);
+  overflow-x: hidden;
 }
 
 .stat {
@@ -321,28 +322,26 @@
 }
 
 /* Responsive design */
-@media (max-width: 768px) {
+@media (max-width: 1156px) {
   .pdf-results-container {
-    margin-top: 15px;
     padding: 15px;
   }
   
   .two-column-layout {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 0px;
   }
   
   .results-header {
     flex-direction: column;
     align-items: stretch;
     text-align: center;
-    margin: 15px 10px 0 10px;
+    margin: 0px 10px 0 10px;
     width: calc(100% - 40px);
   }
   
   .results-header h2 {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
+    display: none;
   }
   
   .upload-another-btn {
@@ -354,19 +353,46 @@
     flex-direction: column;
     gap: 10px;
   }
-  
-  .spoken-sentence {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .reading-stats {
-    flex-direction: column;
-    gap: 10px;
+
+  .sentence-number {
+    display: none;
   }
   
   .stat-value {
     font-size: 20px;
+  }
+
+  /* Keep only the 2nd (Read) and 3rd (Remaining) stat items visible; hide others. */
+  .reading-stats .stat:not(:nth-child(2)):not(:nth-child(3)) {
+    display: none;
+  }
+
+  .header-buttons {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 769px) {
+  .spoken-sentences {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Stack the right column above the left column on narrow screens */
+  .right-col-pdf_results {
+    order: -1; /* works if using flex or for grid fallback */
+    /* For grid layout, ensure it appears first */
+    grid-row: 1;
+  }
+
+  .current-sentence-container h3 {
+    display: none;
+  }
+
+  /* More specific selector so this mobile color override wins over other global .stat-value rules */
+  .pdf-results-container .reading-stats .stat .stat-value {
+    color: #000;
   }
 }
 

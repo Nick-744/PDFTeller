@@ -11,6 +11,7 @@ const TTSComponent = ({
   const [speechRate,      setSpeechRate     ] = useState(1.0)
   const [availableVoices, setAvailableVoices] = useState([])
   const [selectedVoice,   setSelectedVoice  ] = useState(null)
+  const [showSettings,    setShowSettings   ] = useState(false)
   const utteranceRef = useRef(null)
 
   // Load available voices
@@ -88,7 +89,18 @@ const TTSComponent = ({
         </button>
       </div>
 
-      <div className = "tts-settings">
+      {/* Mobile-only toggle for expanded settings */}
+      <button
+      type          = "button"
+      className     = "tts-settings-toggle"
+      onClick       = {() => setShowSettings(s => !s)}
+      aria-expanded = {showSettings}
+      aria-controls = "tts-settings-panel"
+      >
+        {showSettings ? 'Hide settings' : 'Show settings'}
+      </button>
+
+      <div id = "tts-settings-panel" className = {`tts-settings ${showSettings ? 'open' : ''}`}>
         <div className = "setting-group">
           <label htmlFor = "voice-select">Voice:</label>
           <select 
@@ -121,13 +133,10 @@ const TTSComponent = ({
       </div>
 
       <div className = "tts-status">
-        <span className = "current-sentence-indicator">
-          Reading: {currentIndex + 1} of {sentences.length}
-        </span>
         <div className = "progress-bar">
-          <div 
-            className = "progress-fill" 
-            style = {{ width: `${((currentIndex + 1) / sentences.length) * 100}%` }}
+          <div
+            className = "progress-fill"
+            style     = {{ width: `${((currentIndex + 1) / sentences.length) * 100}%` }}
           ></div>
         </div>
       </div>

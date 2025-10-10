@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // Create an instance of axios with a base URL
 const api = axios.create({
-    baseURL: 'http://localhost:8000',
+    baseURL: 'http://192.168.1.21:8000',
 })
 
 // Bookmark function

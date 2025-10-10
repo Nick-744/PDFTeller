@@ -53,6 +53,17 @@
   margin-bottom: 20px;
 }
 
+.tts-settings-toggle {
+  display: none;
+  margin: 8px 0 12px 0;
+  padding: 8px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-weight: 600;
+}
+
 .setting-group {
   display: flex;
   flex-direction: column;
@@ -90,6 +101,7 @@
   background: rgba(255, 255, 255, 0.3);
   outline: none;
   cursor: pointer;
+  margin-bottom: 8px;
 }
 
 .slider::-webkit-slider-thumb {
@@ -120,12 +132,6 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
-
-.current-sentence-indicator {
-  font-size: 14px;
-  font-weight: 600;
-  opacity: 0.9;
 }
 
 .progress-bar {
@@ -163,19 +169,47 @@
 /* Responsive design */
 @media (max-width: 768px) {
   .tts-controls {
-    padding: 15px;
+    padding: 12px;
+    margin-bottom: 0;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .tts-buttons {
     justify-content: center;
+    width: 100%;
   }
   
   .tts-btn {
-    flex: 1;
-    min-width: 80px;
+    flex: 0 1 auto;
+    min-width: 90px;
+    max-width: 100%;
   }
   
+  .tts-settings-toggle {
+    display: inline-block;
+    width: 100%;
+  }
+
   .tts-settings {
     grid-template-columns: 1fr;
+    margin-bottom: 10px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .tts-settings.open {
+    max-height: 260px; /* enough to show both selectors */
+  }
+
+  .setting-group label {
+    font-size: 11px;
+  }
+  .voice-select {
+    width: 100%;
   }
 }

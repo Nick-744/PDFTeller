@@ -198,6 +198,7 @@ html {
 }
 
 .result-container.error .retry-button {
+  margin-top: 20px;
   background: #dc3545;
 }
 

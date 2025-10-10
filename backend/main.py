@@ -13,7 +13,8 @@ app = FastAPI()
 pdf_library = PDFLibraryManager()
 
 origins = [
-    'http://localhost:5173'
+    'http://localhost:5173',
+    'http://192.168.1.21:5173'
 ]
 
 app.add_middleware(
