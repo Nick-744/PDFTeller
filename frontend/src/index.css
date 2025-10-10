@@ -1,5 +1,10 @@
-/* Import OpenDyslexic3 font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=OpenDyslexic3&display=swap');
+/* Local OpenDyslexic3 font-face for full compatibility */
+@font-face {
+  font-family: 'OpenDyslexic3';
+  src:         url('/fonts/OpenDyslexic3-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style:  normal;
+}
 
 /* Global font application */
 * {

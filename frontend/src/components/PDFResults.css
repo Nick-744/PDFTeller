@@ -413,6 +413,7 @@
     padding: 12px 16px;
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.4);
   }
 
   /* Ensure the rest of the page has room above the fixed left column */
